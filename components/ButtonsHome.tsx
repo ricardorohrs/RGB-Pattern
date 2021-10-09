@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 import { View } from './Themed';
 
-export default function ButtonsHome() {
+export default function ButtonsHome({ navigation }: { navigation: any }) {
   return (
     <View>
 
@@ -15,7 +15,7 @@ export default function ButtonsHome() {
           Continuar Jogo
         </Button>
 
-        <Button style={styles.button} icon="" color={ '#1e88e5' } mode="contained" onPress={() => console.log('historico')}>
+        <Button style={styles.button} icon="" color={ '#1e88e5' } mode="contained" onPress={() => navigation.navigate('History')}>
           Histórico
         </Button>
 

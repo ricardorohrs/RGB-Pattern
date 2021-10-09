@@ -5,12 +5,12 @@ import ButtonsHome from '../components/ButtonsHome';
 import { View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 
-export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
+export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/images/logo_name.png')}/>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <ButtonsHome/>
+      <ButtonsHome navigation={ navigation }/>
     </View>
   );
 }
