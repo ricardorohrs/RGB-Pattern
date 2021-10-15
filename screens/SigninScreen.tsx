@@ -4,10 +4,20 @@ import {View} from '../components/Themed';
 import {Button, TextInput} from "react-native-paper";
 import Header from "../components/Header";
 
-export default function LoginScreen({ navigation }: { navigation: any }) {
+export default function SigninScreen({ navigation }: { navigation: any }) {
     return (
         <View style={styles.container}>
             <Header/>
+
+            <TextInput
+                style={styles.input}
+                label="Nome completo"
+                placeholder="João Da Silva"
+                mode={'outlined'}
+                outlineColor={'#1e88e5'}
+                theme={{ colors: { primary: '#1e88e5'} }}
+                right={<TextInput.Icon name="account"/>}
+            />
 
             <TextInput
                 style={styles.input}
@@ -30,13 +40,12 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 secureTextEntry
             />
 
-            <Button style={styles.button} color={'#1e88e5'} mode="contained"
-                    onPress={() => console.log('login')}>
-                Login
+            <Button style={styles.button} color={'#1e88e5'} mode="contained" onPress={() => console.log('signin')}>
+                Registrar
             </Button>
 
-            <Button color="#a5a5a5" mode="text" style={styles.signin} onPress={() => navigation.navigate('Signin')}>
-                Registre-se
+            <Button color="#a5a5a5" labelStyle={{ fontSize: 10 }} mode="text" style={styles.login} onPress={() => navigation.navigate('Login')}>
+                Já tem uma conta? Faça o login aqui.
             </Button>
         </View>
     );
@@ -50,19 +59,19 @@ const styles = StyleSheet.create({
     button: {
         width: 250,
         padding: 10,
-        marginTop: 35,
+        marginTop: 20,
         alignSelf: 'center',
     },
     input: {
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingVertical: 7,
         borderRadius: 5,
         alignSelf: "stretch",
         marginBottom: 15,
         marginHorizontal: 20,
         fontSize: 16,
     },
-    signin: {
-        paddingTop: 20,
+    login: {
+        paddingTop: 10,
     }
 });
