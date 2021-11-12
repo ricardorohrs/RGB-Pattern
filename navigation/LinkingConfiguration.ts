@@ -10,28 +10,28 @@ import * as Linking from 'expo-linking';
 import { RootStackParamList } from '../types';
 
 const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: [Linking.makeUrl('/')],
-  config: {
-    screens: {
-      Root: {
+    prefixes: [Linking.makeUrl('/')],
+    config: {
         screens: {
-          Home: {
-            screens: {
-              HomeScreen: 'one',
+            Root: {
+                screens: {
+                    Home: {
+                        screens: {
+                            HomeScreen: 'one',
+                        },
+                    },
+                    History: {
+                        screens: {
+                            HistoryScreen: 'two',
+                        },
+                    },
+                },
             },
-          },
-          History: {
-            screens: {
-              HistoryScreen: 'two',
-            },
-          },
+            Login: 'login',
+            Signin: 'signin',
+            NotFound: '*',
         },
-      },
-      Login: 'login',
-      Signin: 'signin',
-      NotFound: '*',
     },
-  },
 };
 
 export default linking;
