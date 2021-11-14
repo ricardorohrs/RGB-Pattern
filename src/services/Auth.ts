@@ -1,8 +1,14 @@
 import jwt from 'jsonwebtoken';
-import Axios, { AxiosResponse } from 'axios';
+import Axios from 'axios';
 export const apiUrl = 'https://rgb-pattern-api.herokuapp.com/api';
 
 type Response = {
+    status: number;
+    statusText: string;
+    data: {
+        payload: any;
+        message: string;
+    };
     auth: boolean;
     token: string;
 };
@@ -18,8 +24,8 @@ export const login = async (email: string, password: string) => {
         const data = await handleResponse(response);
 
         return {
-            token: data.payload[0].token,
-            data: jwt.decode(data.payload[0].token),
+            token: data?.payload[0].token,
+            user: jwt.decode(data?.payload[0].token),
         };
     } catch (err) {
         return {
@@ -37,11 +43,6 @@ export const logout = () => {
 export const handleResponse = async (response: Response) => {
     try {
         if (response.status !== 200) {
-            if (response.status === 404 || response.status === 500) {
-                logout();
-                History.push('/login');
-                window.location.reload();
-            }
             const error =
                 (response.data && response.data.message) || response.statusText;
             throw error;

@@ -5,7 +5,7 @@ import { View } from './Themed';
 export default function Header() {
     return (
         <View style={styles.container}>
-            <Image source={require('../assets/images/logo_name.png')} />
+            <Image source={require('../../assets/images/logo_name.png')} />
             <View
                 style={styles.separator}
                 lightColor="#eee"
