@@ -4,10 +4,12 @@ import { StyleSheet } from 'react-native';
 
 import { Button, TextInput } from 'react-native-paper';
 
+import jwt from 'jsonwebtoken';
+
 import { View } from '../components/Themed';
 import Header from '../components/Header';
 
-import { login } from '../api/Auth';
+import { login } from '../services/Auth';
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
     const [email, setEmail] = React.useState('');
@@ -18,25 +20,19 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
     const [popupTitle, setPopupTitle] = React.useState('');
     const [success] = React.useState(1);
 
-    // const handleSubmit = async () => {
-    //     try {
-    //         const user = await login(email, password);
-    //         if (user.error) {
-    //             setPopupTitle('Erro');
-    //             setPopupText('Verifique seu email e senha');
-    //             setPopup(true);
-    //         } else if (user.token) {
-    //             setAuthData({
-    //                 token: user.token,
-    //                 user: user.data.data,
-    //             });
-
-    //             navigation.navigate('Home');
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
+    const handleSubmit = async () => {
+        try {
+            const { data } = (await login(email, password)) as any;
+            const user = jwt.decode(data.payload[0].token);
+            const token = data.payload[0].token;
+            console.log(user, token);
+            // testar erro para salvar token
+            navigation.navigate('Home');
+        } catch (error) {
+            navigation.navigate('Login');
+            console.log(`Error while login - ${error}`);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -53,7 +49,6 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 value={email}
                 onChangeText={(value) => {
                     setEmail(value);
-                    console.log(value);
                 }}
             />
 
@@ -69,7 +64,6 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 value={password}
                 onChangeText={(value) => {
                     setPassword(value);
-                    console.log(value);
                 }}
             />
 
