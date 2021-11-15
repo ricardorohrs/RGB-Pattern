@@ -1,19 +1,10 @@
 import Axios from 'axios';
 export const apiUrl = 'https://rgb-pattern-api.herokuapp.com/api';
-
-type Response =
-    | {
-          data: {
-              message: string;
-              payload: Array<{ token: string; auth: boolean }>;
-              status: string;
-          };
-      }
-    | { erro: boolean; message: string };
+import jwt_decode from 'jwt-decode';
 
 export const login = async (email: string, password: string) => {
     try {
-        return (await Axios.post(
+        const response = await Axios.post(
             `${apiUrl}/auth/login`,
             {
                 email,
@@ -24,7 +15,11 @@ export const login = async (email: string, password: string) => {
                     'Content-Type': 'application/json',
                 },
             }
-        )) as Response;
+        );
+        return {
+            user: jwt_decode(response.data.payload[0].token),
+            token: response.data.payload[0].token,
+        };
     } catch (err) {
         return {
             error: true,

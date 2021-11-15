@@ -4,8 +4,6 @@ import { StyleSheet } from 'react-native';
 
 import { Button, TextInput } from 'react-native-paper';
 
-import jwt from 'jsonwebtoken';
-
 import { View } from '../components/Themed';
 import Header from '../components/Header';
 
@@ -22,9 +20,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
 
     const handleSubmit = async () => {
         try {
-            const { data } = (await login(email, password)) as any;
-            const user = jwt.decode(data.payload[0].token);
-            const token = data.payload[0].token;
+            const { user, token } = (await login(email, password)) as any;
             console.log(user, token);
             // testar erro para salvar token
             navigation.navigate('Home');
@@ -47,7 +43,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 theme={{ colors: { primary: '#1e88e5' } }}
                 right={<TextInput.Icon name="email" />}
                 value={email}
-                onChangeText={(value) => {
+                onChangeText={(value: string) => {
                     setEmail(value);
                 }}
             />
@@ -62,7 +58,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 right={<TextInput.Icon name="eye" />}
                 secureTextEntry
                 value={password}
-                onChangeText={(value) => {
+                onChangeText={(value: string) => {
                     setPassword(value);
                 }}
             />
