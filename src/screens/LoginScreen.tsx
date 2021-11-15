@@ -1,7 +1,5 @@
 import * as React from 'react';
-
 import { StyleSheet } from 'react-native';
-
 import { Button, TextInput } from 'react-native-paper';
 
 import { View } from '../components/Themed';
@@ -9,9 +7,13 @@ import Header from '../components/Header';
 
 import { login } from '../services/Auth';
 
+import AuthContext from '../contexts/authContext';
+
 export default function LoginScreen({ navigation }: { navigation: any }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+
+    const { setAuthData } = React.useContext(AuthContext);
 
     const [popup, setPopup] = React.useState(false);
     const [popupText, setPopupText] = React.useState('');
@@ -21,9 +23,13 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
     const handleSubmit = async () => {
         try {
             const { user, token } = (await login(email, password)) as any;
-            console.log(user, token);
-            // testar erro para salvar token
-            navigation.navigate('Home');
+            if (token) {
+                setAuthData({
+                    user,
+                    token,
+                });
+                navigation.navigate('Home');
+            }
         } catch (error) {
             navigation.navigate('Login');
             console.log(`Error while login - ${error}`);
