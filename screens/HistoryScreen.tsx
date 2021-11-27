@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import {Image, ScrollView, StyleSheet} from 'react-native';
 import { Text, View } from '../components/Themed';
 import { ProgressBar } from 'react-native-paper';
 
@@ -13,6 +13,20 @@ export default function HistoryScreen() {
     return (
         <ScrollView>
             <View style={styles.header}>
+                <View style={styles.image}>
+                    <Image style={styles.badge} source={require('../assets/images/levels/pleno.png')}/>
+                </View>
+                <View style={styles.imageList}>
+                    <Image style={styles.images} source={require('../assets/images/levels/estagiario.png')}/>
+                    <Image style={styles.images} source={require('../assets/images/levels/junior.png')}/>
+                    <Image style={styles.images} source={require('../assets/images/levels/pleno.png')}/>
+                    <Image style={styles.images} source={require('../assets/images/levels/senior.png')}/>
+                    <Image style={styles.images} source={require('../assets/images/levels/master.png')}/>
+                    <Image style={styles.images} source={require('../assets/images/levels/especialista.png')}/>
+                </View>
+            </View>
+
+            <View style={styles.questions}>
                 <Text style={styles.title}>
                     Olá, <B>Usuário</B>!
                 </Text>
@@ -22,16 +36,14 @@ export default function HistoryScreen() {
                 <Text style={styles.score}>999 pontos</Text>
             </View>
 
-            <View style={styles.questions}>
-                <Text style={styles.title}>Taxa de acertos:</Text>
-                <ProgressBar progress={0.5} color={'rgb(75,75,225)'} />
-                <Text style={{ textAlign: 'right' }}>5/10 - 50%</Text>
-            </View>
-
             <View style={styles.card}>
                 <Text style={{ textAlign: 'left' }}>Pleno</Text>
                 <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} />
                 <Text style={{ textAlign: 'right' }}>Sênior</Text>
+
+                <Text style={{ paddingTop: 35 }}>Taxa de acertos:</Text>
+                <ProgressBar progress={0.5} color={'rgb(75,75,225)'} />
+                <Text style={{ textAlign: 'right' }}>5/10 - 50%</Text>
             </View>
         </ScrollView>
     );
@@ -40,8 +52,29 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
     header: {
         backgroundColor: 'rgba(75, 225, 75, 0.5)',
-        padding: 50,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         height: 225,
+    },
+    image: {
+        backgroundColor: 'rgba(75, 225, 75, 0)',
+    },
+    badge: {
+        marginTop: 40,
+        width: 100,
+        resizeMode: "contain",
+    },
+    images: {
+        width: 30,
+        resizeMode: "contain",
+        marginHorizontal: 15,
+        tintColor: "rgba(255,255,255,0.7)",
+    },
+    imageList: {
+        marginTop: -75,
+        flexDirection: "row",
+        backgroundColor: 'rgba(75, 225, 75, 0)',
     },
     questions: {
         backgroundColor: 'rgba(75, 75, 225, 0.5)',

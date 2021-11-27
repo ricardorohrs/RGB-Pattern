@@ -86,7 +86,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 color="#a5a5a5"
                 mode="text"
                 style={styles.signin}
-                onPress={() => navigation.navigate('Signin')}
+                onPress={() => navigation.navigate('Registrar')}
             >
                 Registre-se
             </Button>

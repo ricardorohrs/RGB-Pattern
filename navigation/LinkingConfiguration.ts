@@ -28,7 +28,7 @@ const linking: LinkingOptions<RootStackParamList> = {
                 },
             },
             Login: 'login',
-            Signin: 'signin',
+            Registrar: 'signin',
             NotFound: '*',
         },
     },
