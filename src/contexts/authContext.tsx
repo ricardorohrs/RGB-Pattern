@@ -54,8 +54,6 @@ export const AuthProvider: React.FC = ({ children }) => {
         storeData(auth.data);
     }, [auth.data]);
 
-    console.log(auth);
-
     return (
         <AuthContext.Provider value={{ auth, setAuthData }}>
             {children}
