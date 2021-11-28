@@ -1,42 +1,41 @@
-import * as React from 'react';
-
+import React from 'react';
 import { StyleSheet } from 'react-native';
-
 import { Button, TextInput } from 'react-native-paper';
 
 import { View } from '../components/Themed';
 import Header from '../components/Header';
 
-import { login } from '../api/Auth';
+import { login } from '../services/Auth';
+
+import AuthContext from '../contexts/authContext';
+import { Auth } from '../contexts/authContext';
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+
+    const { setAuthData } = React.useContext(AuthContext) as Auth;
 
     const [popup, setPopup] = React.useState(false);
     const [popupText, setPopupText] = React.useState('');
     const [popupTitle, setPopupTitle] = React.useState('');
     const [success] = React.useState(1);
 
-    // const handleSubmit = async () => {
-    //     try {
-    //         const user = await login(email, password);
-    //         if (user.error) {
-    //             setPopupTitle('Erro');
-    //             setPopupText('Verifique seu email e senha');
-    //             setPopup(true);
-    //         } else if (user.token) {
-    //             setAuthData({
-    //                 token: user.token,
-    //                 user: user.data.data,
-    //             });
-
-    //             navigation.navigate('Home');
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
+    const handleSubmit = async () => {
+        try {
+            const { user, token } = await login(email, password);
+            if (token) {
+                setAuthData({
+                    user,
+                    token,
+                } as any);
+                navigation.navigate('Home');
+            }
+        } catch (error) {
+            navigation.navigate('Login');
+            console.log(`Error while login - ${error}`);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -51,9 +50,8 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 theme={{ colors: { primary: '#1e88e5' } }}
                 right={<TextInput.Icon name="email" />}
                 value={email}
-                onChangeText={(value) => {
+                onChangeText={(value: string) => {
                     setEmail(value);
-                    console.log(value);
                 }}
             />
 
@@ -67,9 +65,8 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 right={<TextInput.Icon name="eye" />}
                 secureTextEntry
                 value={password}
-                onChangeText={(value) => {
+                onChangeText={(value: string) => {
                     setPassword(value);
-                    console.log(value);
                 }}
             />
 

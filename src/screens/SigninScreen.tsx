@@ -4,28 +4,35 @@ import { View } from '../components/Themed';
 import { Button, TextInput } from 'react-native-paper';
 import Header from '../components/Header';
 
+import { createUser } from '../services/User';
+
 export default function SigninScreen({ navigation }: { navigation: any }) {
-    // const saveUser = async () => {
-    //     try {
-    //         const response = await createUser(
-    //             auth,
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [name, setName] = React.useState('');
 
-    //         );
+    const saveUser = async () => {
+        try {
+            const { status, message } = (await createUser(
+                email,
+                password,
+                name
+            )) as any;
 
-    //         if (response.status !== 201) throw Error(response.message);
+            if (status !== 201) throw Error(message);
 
-    //         // setPopupTitle('Sucesso');
-    //         // setPopupText('Proposta criada com sucesso.');
-    //         // setPopup(true);
-    //         // setSuccess(1);
-    //     } catch (error) {
-    //         console.log(error);
-    //         // setPopupTitle('Erro');
-    //         // setPopupText('Proposta não pode ser criada.');
-    //         // setPopup(true);
-    //         // setSuccess(1);
-    //     }
-    // }
+            // setPopupTitle('Sucesso');
+            // setPopupText('Proposta criada com sucesso.');
+            // setPopup(true);
+            // setSuccess(1);
+        } catch (error) {
+            console.log(error);
+            // setPopupTitle('Erro');
+            // setPopupText('Proposta não pode ser criada.');
+            // setPopup(true);
+            // setSuccess(1);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -34,39 +41,51 @@ export default function SigninScreen({ navigation }: { navigation: any }) {
             <TextInput
                 style={styles.input}
                 label="Nome completo"
+                value={name}
                 placeholder="João Da Silva"
                 mode={'outlined'}
                 outlineColor={'#1e88e5'}
                 theme={{ colors: { primary: '#1e88e5' } }}
                 right={<TextInput.Icon name="account" />}
+                onChangeText={(value: string) => {
+                    setName(value);
+                }}
             />
 
             <TextInput
                 style={styles.input}
                 label="E-mail"
+                value={email}
                 placeholder="exemplo@gmail.com"
                 mode={'outlined'}
                 outlineColor={'#1e88e5'}
                 theme={{ colors: { primary: '#1e88e5' } }}
                 right={<TextInput.Icon name="email" />}
+                onChangeText={(value: string) => {
+                    setEmail(value);
+                }}
             />
 
             <TextInput
                 style={styles.input}
                 label="Senha"
+                value={password}
                 placeholder="12345678"
                 mode={'outlined'}
                 outlineColor={'#1e88e5'}
                 theme={{ colors: { primary: '#1e88e5' } }}
                 right={<TextInput.Icon name="eye" />}
                 secureTextEntry
+                onChangeText={(value: string) => {
+                    setPassword(value);
+                }}
             />
 
             <Button
                 style={styles.button}
                 color={'#1e88e5'}
                 mode="contained"
-                onPress={() => createUser()}
+                onPress={() => saveUser()}
             >
                 Registrar
             </Button>
