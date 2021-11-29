@@ -14,15 +14,15 @@ export default function HistoryScreen() {
         <ScrollView>
             <View style={styles.header}>
                 <View style={styles.image}>
-                    <Image style={styles.badge} source={require('../assets/images/levels/pleno.png')}/>
+                    <Image style={styles.badge} source={require('../../assets/images/levels/pleno.png')}/>
                 </View>
                 <View style={styles.imageList}>
-                    <Image style={styles.images} source={require('../assets/images/levels/estagiario.png')}/>
-                    <Image style={styles.images} source={require('../assets/images/levels/junior.png')}/>
-                    <Image style={styles.images} source={require('../assets/images/levels/pleno.png')}/>
-                    <Image style={styles.images} source={require('../assets/images/levels/senior.png')}/>
-                    <Image style={styles.images} source={require('../assets/images/levels/master.png')}/>
-                    <Image style={styles.images} source={require('../assets/images/levels/especialista.png')}/>
+                    <Image style={styles.images} source={require('../../assets/images/levels/estagiario.png')}/>
+                    <Image style={styles.images} source={require('../../assets/images/levels/junior.png')}/>
+                    <Image style={styles.images} source={require('../../assets/images/levels/pleno.png')}/>
+                    <Image style={styles.images} source={require('../../assets/images/levels/senior.png')}/>
+                    <Image style={styles.images} source={require('../../assets/images/levels/master.png')}/>
+                    <Image style={styles.images} source={require('../../assets/images/levels/especialista.png')}/>
                 </View>
             </View>
 

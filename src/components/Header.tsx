@@ -5,14 +5,13 @@ import useColorScheme from '../hooks/useColorScheme';
 
 export default function Header() {
     const colorScheme = useColorScheme();
-    console.log(colorScheme);
     return (
         <View style={styles.container}>
             <Image
                 source={
                     colorScheme === 'dark'
-                        ? require('../assets/images/logo_dark_name.png')
-                        : require('../assets/images/logo_name.png')
+                        ? require('../../assets/images/logo_dark_name.png')
+                        : require('../../assets/images/logo_name.png')
                 }
             />
             <View
