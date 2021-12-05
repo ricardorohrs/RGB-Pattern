@@ -1,9 +1,38 @@
 import * as React from 'react';
-import {Image, ScrollView, StyleSheet} from 'react-native';
+import { Image, ScrollView, StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { ProgressBar } from 'react-native-paper';
 
+import { AxiosResponse } from 'axios';
+
+import AuthContext from '../contexts/authContext';
+import { findAnswerFromUser } from '../services/User';
+
 export default function HistoryScreen() {
+    const [level, setLevel] = React.useState(0);
+    const { auth } = React.useContext(AuthContext) as any;
+
+    React.useEffect(() => {
+        const callAPiFindAnswerFromUser = async () => {
+            const response = (await findAnswerFromUser(
+                auth.data.token,
+                auth.data.user.userId
+            )) as AxiosResponse;
+            const { message, payload } = response.data;
+
+            if (response.status !== 200) throw Error(message);
+
+            // filtrar o payload para pegar as respostas certas e calcular o level
+            setLevel(1);
+        };
+
+        try {
+            callAPiFindAnswerFromUser();
+        } catch (err) {
+            console.log(err);
+        }
+    }, [auth]);
+
     const B = (props: any) => (
         <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
             {props.children}
@@ -14,15 +43,36 @@ export default function HistoryScreen() {
         <ScrollView>
             <View style={styles.header}>
                 <View style={styles.image}>
-                    <Image style={styles.badge} source={require('../../assets/images/levels/pleno.png')}/>
+                    <Image
+                        style={styles.badge}
+                        source={require('../../assets/images/levels/pleno.png')}
+                    />
                 </View>
                 <View style={styles.imageList}>
-                    <Image style={styles.images} source={require('../../assets/images/levels/estagiario.png')}/>
-                    <Image style={styles.images} source={require('../../assets/images/levels/junior.png')}/>
-                    <Image style={styles.images} source={require('../../assets/images/levels/pleno.png')}/>
-                    <Image style={styles.images} source={require('../../assets/images/levels/senior.png')}/>
-                    <Image style={styles.images} source={require('../../assets/images/levels/master.png')}/>
-                    <Image style={styles.images} source={require('../../assets/images/levels/especialista.png')}/>
+                    <Image
+                        style={styles.images}
+                        source={require('../../assets/images/levels/estagiario.png')}
+                    />
+                    <Image
+                        style={styles.images}
+                        source={require('../../assets/images/levels/junior.png')}
+                    />
+                    <Image
+                        style={styles.images}
+                        source={require('../../assets/images/levels/pleno.png')}
+                    />
+                    <Image
+                        style={styles.images}
+                        source={require('../../assets/images/levels/senior.png')}
+                    />
+                    <Image
+                        style={styles.images}
+                        source={require('../../assets/images/levels/master.png')}
+                    />
+                    <Image
+                        style={styles.images}
+                        source={require('../../assets/images/levels/especialista.png')}
+                    />
                 </View>
             </View>
 
@@ -52,9 +102,9 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
     header: {
         backgroundColor: 'rgba(75, 225, 75, 0.5)',
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: 225,
     },
     image: {
@@ -63,17 +113,17 @@ const styles = StyleSheet.create({
     badge: {
         marginTop: 40,
         width: 100,
-        resizeMode: "contain",
+        resizeMode: 'contain',
     },
     images: {
         width: 30,
-        resizeMode: "contain",
+        resizeMode: 'contain',
         marginHorizontal: 15,
-        tintColor: "rgba(255,255,255,0.7)",
+        tintColor: 'rgba(255,255,255,0.7)',
     },
     imageList: {
         marginTop: -75,
-        flexDirection: "row",
+        flexDirection: 'row',
         backgroundColor: 'rgba(75, 225, 75, 0)',
     },
     questions: {

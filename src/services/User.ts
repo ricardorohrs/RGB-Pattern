@@ -20,3 +20,16 @@ export const createUser = async (
         return err;
     }
 };
+
+export const findAnswerFromUser = async (token: string, userId: string) => {
+    try {
+        return await Axios.get(
+            `${apiUrl}/users/${userId}/answers/answerFromUser`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+    } catch (err) {
+        return err;
+    }
+};
