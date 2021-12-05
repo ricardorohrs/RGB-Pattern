@@ -5,11 +5,17 @@ import { Button, TextInput } from 'react-native-paper';
 import Header from '../components/Header';
 
 import { createUser } from '../services/User';
+import { login } from '../services/Auth';
+
+import AuthContext from '../contexts/authContext';
+import { Auth } from '../contexts/authContext';
 
 export default function SigninScreen({ navigation }: { navigation: any }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [name, setName] = React.useState('');
+
+    const { setAuthData } = React.useContext(AuthContext) as Auth;
 
     const saveUser = async () => {
         try {
@@ -21,14 +27,30 @@ export default function SigninScreen({ navigation }: { navigation: any }) {
 
             if (status !== 201) throw Error(message);
 
+            try {
+                const { user, token } = await login(email, password);
+                if (token) {
+                    setAuthData({
+                        user,
+                        token,
+                    } as any);
+                    navigation.navigate('Home');
+                }
+            } catch (error) {
+                console.log(error);
+                // setPopupTitle('Erro');
+                // setPopupText('Erro ao direcionar para login.');
+                // setPopup(true);
+                // setSuccess(1);
+            }
             // setPopupTitle('Sucesso');
-            // setPopupText('Proposta criada com sucesso.');
+            // setPopupText('Usuário criado com sucesso.');
             // setPopup(true);
             // setSuccess(1);
         } catch (error) {
             console.log(error);
             // setPopupTitle('Erro');
-            // setPopupText('Proposta não pode ser criada.');
+            // setPopupText('Usuário não pode ser criada.');
             // setPopup(true);
             // setSuccess(1);
         }
