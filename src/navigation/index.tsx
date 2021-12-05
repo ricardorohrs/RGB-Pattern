@@ -27,6 +27,8 @@ import {
 } from '../../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import SigninScreen from '../screens/SigninScreen';
+import GameScreen from "../screens/GameScreen";
+import HelpScreen from "../screens/HelpScreen";
 
 export default function Navigation({
     colorScheme,
@@ -65,6 +67,8 @@ function RootNavigator() {
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="Registrar" component={SigninScreen} />
+                <Stack.Screen name="Game" component={GameScreen} />
+                <Stack.Screen name="Ajuda" component={HelpScreen} />
             </Stack.Group>
         </Stack.Navigator>
     );
@@ -101,6 +105,8 @@ function BottomTabNavigator() {
                                 opacity: pressed ? 0.5 : 1,
                             })}
                         >
+                            {/*<Text style={{color: Colors[colorScheme].text, marginRight: 15, fontSize: 16, fontFamily: 'space-mono'}}>99 pontos</Text>*/}
+                            {/*<Image style={{width: 40, resizeMode: "contain", marginRight: 15}} source={require('../../assets/images/levels/pleno.png')}/>*/}
                             <FontAwesome
                                 name="info-circle"
                                 size={25}
@@ -114,12 +120,27 @@ function BottomTabNavigator() {
             <BottomTab.Screen
                 name="History"
                 component={HistoryScreen}
-                options={{
+                options={({ navigation }: RootTabScreenProps<'History'>) => ({
                     title: 'Histórico',
                     tabBarIcon: ({ color }) => (
                         <TabBarIcon name="code" color={color} />
                     ),
-                }}
+                    headerRight: () => (
+                        <Pressable
+                            onPress={() => navigation.navigate('Ajuda')}
+                            style={({ pressed }) => ({
+                                opacity: pressed ? 0.5 : 1,
+                            })}
+                        >
+                            <FontAwesome
+                                name="question-circle"
+                                size={25}
+                                color={Colors[colorScheme].text}
+                                style={{ marginRight: 15 }}
+                            />
+                        </Pressable>
+                    ),
+                })}
             />
         </BottomTab.Navigator>
     );
