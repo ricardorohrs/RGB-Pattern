@@ -10,7 +10,7 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
                 style={styles.button}
                 color={'#1e88e5'}
                 mode="contained"
-                onPress={() => console.log('novo jogo')}
+                onPress={() => navigation.navigate('Game')}
             >
                 Novo Jogo
             </Button>
