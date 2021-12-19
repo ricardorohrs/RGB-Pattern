@@ -8,9 +8,27 @@ import { AxiosResponse } from 'axios';
 import AuthContext from '../contexts/authContext';
 import { findAnswerFromUser } from '../services/User';
 
+const levels = ['Junior', 'Pleno', 'Senior'];
+
 export default function HistoryScreen() {
-    const [level, setLevel] = React.useState(0);
+    const [level, setLevel] = React.useState('');
+    const [points, setPoints] = React.useState(0);
+    const [corrects, setCorrects] = React.useState(0);
+    const [incorrects, setIncorrects] = React.useState(0);
+
+    // estado calculado a partir da soma de pts / quantidade de respostas
+    const [rate, setRate] = React.useState(0);
+
     const { auth } = React.useContext(AuthContext) as any;
+
+    const nextLevel = (level: string) => {
+        return level === 'Junior' ? 'Pleno' : level === 'Pleno' ? 'Senior' : '';
+    };
+
+    React.useEffect(() => {
+        setCorrects(0);
+        setIncorrects(0);
+    }, []);
 
     React.useEffect(() => {
         const callAPiFindAnswerFromUser = async () => {
@@ -22,8 +40,29 @@ export default function HistoryScreen() {
 
             if (response.status !== 200) throw Error(message);
 
-            // filtrar o payload para pegar as respostas certas e calcular o level
-            setLevel(1);
+            const { points, rate } = payload.reduce(
+                (acc: any, curr: any, index: number, arr: object[]) => {
+                    return {
+                        points: acc.points + curr.points,
+                        rate: (acc.points + curr.points) / arr.length,
+                    };
+                }
+            );
+
+            payload.map((curr: any) => {
+                if (curr.isCorrect) {
+                    setCorrects((prevState: number) => prevState + 1);
+                } else {
+                    setIncorrects((prevState: number) => prevState + 1);
+                }
+            });
+
+            if (rate >= 25) setLevel('Junior');
+            else if (rate >= 50) setLevel('Pleno');
+            else if (rate >= 75) setLevel('Senior');
+
+            setPoints(points);
+            setRate(rate);
         };
 
         try {
@@ -78,22 +117,31 @@ export default function HistoryScreen() {
 
             <View style={styles.questions}>
                 <Text style={styles.title}>
-                    Olá, <B>Usuário</B>!
+                    {`Olá,${auth.data.user.userName}!`}
                 </Text>
                 <Text style={styles.subtitle}>
-                    Você está no nível <B>pleno</B>
+                    {`Você esta no nível ${level}`}
                 </Text>
-                <Text style={styles.score}>999 pontos</Text>
+                <Text style={styles.score}>{`${points} pontos`}</Text>
             </View>
 
             <View style={styles.card}>
-                <Text style={{ textAlign: 'left' }}>Pleno</Text>
+                <Text style={{ textAlign: 'left' }}>{level}</Text>
                 <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} />
-                <Text style={{ textAlign: 'right' }}>Sênior</Text>
+                <Text style={{ textAlign: 'right' }}>{`${nextLevel(
+                    level
+                )} - ${rate} pts`}</Text>
 
                 <Text style={{ paddingTop: 35 }}>Taxa de acertos:</Text>
                 <ProgressBar progress={0.5} color={'rgb(75,75,225)'} />
-                <Text style={{ textAlign: 'right' }}>5/10 - 50%</Text>
+                <Text style={{ textAlign: 'right' }}>
+                    {`${corrects}/${corrects + incorrects} - ${(
+                        corrects /
+                        (corrects + incorrects)
+                    )
+                        .toString()
+                        .replace('0.', '')}%`}
+                </Text>
             </View>
         </ScrollView>
     );
