@@ -8,7 +8,7 @@ import { AxiosResponse } from 'axios';
 import AuthContext from '../contexts/authContext';
 import { findAnswerFromUser } from '../services/User';
 
-const levels = ['Junior', 'Pleno', 'Senior'];
+const levels = ['Estagiário', 'Júnior', 'Pleno', 'Sênior', 'Master', 'Especialista'];
 
 export default function HistoryScreen() {
     const [level, setLevel] = React.useState('');
@@ -22,7 +22,7 @@ export default function HistoryScreen() {
     const { auth } = React.useContext(AuthContext) as any;
 
     const nextLevel = (level: string) => {
-        return level === 'Junior' ? 'Pleno' : level === 'Pleno' ? 'Senior' : '';
+        return level === 'Estagiário' ? 'Júnior' : level === 'Júnior' ? 'Pleno' : level === 'Pleno' ? 'Sênior' : level === 'Sênior' ? 'Master' : level === 'Master' ? 'Especialista' : '';
     };
 
     React.useEffect(() => {
@@ -57,9 +57,12 @@ export default function HistoryScreen() {
                 }
             });
 
-            if (rate >= 25) setLevel('Junior');
-            else if (rate >= 50) setLevel('Pleno');
-            else if (rate >= 75) setLevel('Senior');
+            if (rate >= 25) setLevel('Estagiário');
+            else if (rate >= 50) setLevel('Júnior');
+            else if (rate >= 75) setLevel('Pleno');
+            else if (rate >= 100) setLevel('Sênior');
+            else if (rate >= 125) setLevel('Master');
+            else if (rate >= 150) setLevel('Especialista');
 
             setPoints(points);
             setRate(rate);
@@ -117,10 +120,10 @@ export default function HistoryScreen() {
 
             <View style={styles.questions}>
                 <Text style={styles.title}>
-                    {`Olá,${auth.data.user.userName}!`}
+                    {`Olá, ${auth.data.user.userName}!`}
                 </Text>
                 <Text style={styles.subtitle}>
-                    {`Você esta no nível ${level}`}
+                    {`Você esta no nível ${level} com`}
                 </Text>
                 <Text style={styles.score}>{`${points} pontos`}</Text>
             </View>

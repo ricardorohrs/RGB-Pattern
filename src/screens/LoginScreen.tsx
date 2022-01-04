@@ -29,7 +29,6 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                     user,
                     token,
                 } as any);
-                navigation.navigate('Home');
             }
         } catch (error) {
             navigation.navigate('Login');
