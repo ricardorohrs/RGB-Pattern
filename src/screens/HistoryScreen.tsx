@@ -81,38 +81,75 @@ export default function HistoryScreen() {
         </Text>
     );
 
+    const images = [
+        {
+            text: "Estagiário",
+            image: require('../../assets/images/levels/estagiario.png')
+        },
+        {
+            text: "Júnior",
+            image: require('../../assets/images/levels/junior.png')
+        },
+        {
+            text: "Pleno",
+            image: require('../../assets/images/levels/pleno.png')
+        },
+        {
+            text: "Sênior",
+            image: require('../../assets/images/levels/senior.png')
+        },
+        {
+            text: "Master",
+            image: require('../../assets/images/levels/master.png')
+        },
+        {
+            text: "Especialista",
+            image: require('../../assets/images/levels/especialista.png')
+        }
+    ];
+
+    const badges = (level: string) => {
+        if (level === 'Estagiário') return 0;
+        if (level === 'Júnior') return 1;
+        if (level === 'Pleno') return 2;
+        if (level === 'Sênior') return 3;
+        if (level === 'Master') return 4;
+        if (level === 'Especialista') return 5;
+        return 0;
+    };
+
     return (
         <ScrollView>
             <View style={styles.header}>
                 <View style={styles.image}>
                     <Image
                         style={styles.badge}
-                        source={require('../../assets/images/levels/pleno.png')}
+                        source={images[badges(level)].image}
                     />
                 </View>
                 <View style={styles.imageList}>
                     <Image
-                        style={styles.images}
+                        style={[styles.images, {opacity: badges(level) >= 0 ? 1 : 0.1}]}
                         source={require('../../assets/images/levels/estagiario.png')}
                     />
                     <Image
-                        style={styles.images}
+                        style={[styles.images, {opacity: badges(level) >= 1 ? 1 : 0.1}]}
                         source={require('../../assets/images/levels/junior.png')}
                     />
                     <Image
-                        style={styles.images}
+                        style={[styles.images, {opacity: badges(level) >= 2 ? 1 : 0.1}]}
                         source={require('../../assets/images/levels/pleno.png')}
                     />
                     <Image
-                        style={styles.images}
+                        style={[styles.images, {opacity: badges(level) >= 3 ? 1 : 0.1}]}
                         source={require('../../assets/images/levels/senior.png')}
                     />
                     <Image
-                        style={styles.images}
+                        style={[styles.images, {opacity: badges(level) >= 4 ? 1 : 0.1}]}
                         source={require('../../assets/images/levels/master.png')}
                     />
                     <Image
-                        style={styles.images}
+                        style={[styles.images, {opacity: badges(level) >= 5 ? 1 : 0.1}]}
                         source={require('../../assets/images/levels/especialista.png')}
                     />
                 </View>
@@ -170,7 +207,6 @@ const styles = StyleSheet.create({
         width: 30,
         resizeMode: 'contain',
         marginHorizontal: 15,
-        tintColor: 'rgba(255,255,255,0.7)',
     },
     imageList: {
         marginTop: -75,
