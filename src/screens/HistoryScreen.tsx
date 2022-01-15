@@ -160,17 +160,17 @@ export default function HistoryScreen() {
                     {`Olá, ${auth.data.user.userName}!`}
                 </Text>
                 <Text style={styles.subtitle}>
-                    {`Você esta no nível ${level} com`}
+                    {`Você esta no nível ${ level ? level : 'Estagiário'} com`}
                 </Text>
                 <Text style={styles.score}>{`${points} pontos`}</Text>
             </View>
 
             <View style={styles.card}>
-                <Text style={{ textAlign: 'left' }}>{level}</Text>
+                <Text style={{ textAlign: 'left' }}>{ level ? level : 'Estagiário'}</Text>
                 <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} />
                 <Text style={{ textAlign: 'right' }}>{`${nextLevel(
-                    level
-                )} - ${rate} pts`}</Text>
+                    level ? level : 'Estagiário'
+                )} - ${points ?? 0} pontos`}</Text>
 
                 <Text style={{ paddingTop: 35 }}>Taxa de acertos:</Text>
                 <ProgressBar progress={0.5} color={'rgb(75,75,225)'} />
