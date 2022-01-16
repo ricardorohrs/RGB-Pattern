@@ -22,6 +22,7 @@ import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import {
     RootStackParamList,
+    RootStackScreenProps,
     RootTabParamList,
     RootTabScreenProps,
 } from '../../types';
@@ -58,6 +59,8 @@ export default function Navigation({colorScheme}: { colorScheme: ColorSchemeName
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+    const colorScheme = useColorScheme();
+
     return (
         <Stack.Navigator>
             <Stack.Screen
@@ -71,7 +74,28 @@ function RootNavigator() {
                 options={{ title: 'Oops!' }}
             />
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
-                <Stack.Screen name="Game" component={GameScreen} />
+                <Stack.Screen name="Game" component={GameScreen}  options={({ navigation }: RootStackScreenProps<'Game'>) => ({
+                    title: 'Game',
+                    tabBarIcon: ({ color }: any) => (
+                        <TabBarIcon name="code" color={color} />
+                    ),
+                    headerRight: () => (
+                        <Pressable
+                            onPress={() => navigation.navigate('Ajuda')}
+                            style={({ pressed }) => ({
+                                opacity: pressed ? 0.5 : 1,
+                            })}
+                        >
+                            <FontAwesome
+                                name="question-circle"
+                                size={25}
+                                color={Colors[colorScheme].text}
+                                style={{ marginRight: 15 }}
+                            />
+                        </Pressable>
+                    ),
+                })}
+                />
                 <Stack.Screen name="Ajuda" component={HelpScreen} />
             </Stack.Group>
         </Stack.Navigator>

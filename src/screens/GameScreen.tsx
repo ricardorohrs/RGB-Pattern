@@ -5,6 +5,7 @@ import { View } from '../components/Themed';
 import { Button } from 'react-native-paper';
 import { getProblem } from '../services/Problem';
 import AuthContext from '../contexts/authContext';
+import TipsModal from "../components/TipsModal";
 
 export default function GameScreen({ navigation }: { navigation: any }) {
     const { auth } = React.useContext(AuthContext) as any;
@@ -32,11 +33,13 @@ export default function GameScreen({ navigation }: { navigation: any }) {
         }
     }, []);
 
+    const tip = problems ? problems[0].tips : 'Não há dicas no momento.' as string;
+
     return (
         <ScrollView>
             <View style={styles.container}>
                 <Text style={styles.question}>
-                    {problems && problems?.description}
+                    {problems && problems[0].description}
                 </Text>
                 {problems &&
                     problems[0].options.map((option: any, index: number) => {
@@ -48,6 +51,7 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                                 mode="contained"
                                 onPress={() => {
                                     console.log(`Opção ${index}`);
+                                    console.log(problems);
                                 }}
                             >
                                 {option}
@@ -55,6 +59,8 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                         );
                     })}
             </View>
+
+            <TipsModal tips={tip[0]}/>
         </ScrollView>
     );
 }
@@ -66,11 +72,10 @@ const styles = StyleSheet.create({
     },
     question: {
         color: '#FFF',
-        fontSize: 20,
+        fontSize: 24,
         fontFamily: 'space-mono',
-        paddingHorizontal: 50,
-        marginTop: 30,
-        marginBottom: 70,
+        paddingHorizontal: 40,
+        marginVertical: 70,
     },
     options: {
         width: 250,
