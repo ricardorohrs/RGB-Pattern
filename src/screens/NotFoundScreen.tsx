@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import { RootStackScreenProps } from '../../types';
 
@@ -13,7 +13,7 @@ export default function NotFoundScreen({
                 onPress={() => navigation.replace('Root')}
                 style={styles.link}
             >
-                <Text style={styles.linkText}>Go to home screen!</Text>
+                <Text style={styles.linkText}>Volte para tela inicial!</Text>
             </TouchableOpacity>
         </View>
     );

@@ -75,10 +75,7 @@ function RootNavigator() {
             />
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
                 <Stack.Screen name="Game" component={GameScreen}  options={({ navigation }: RootStackScreenProps<'Game'>) => ({
-                    title: 'Game',
-                    tabBarIcon: ({ color }: any) => (
-                        <TabBarIcon name="code" color={color} />
-                    ),
+                    title: 'Questão 1',
                     headerRight: () => (
                         <Pressable
                             onPress={() => navigation.navigate('Ajuda')}
@@ -135,7 +132,7 @@ function BottomTabNavigator() {
                 options={({ navigation }: RootTabScreenProps<'Home'>) => ({
                     title: 'Home',
                     tabBarIcon: ({ color }) => (
-                        <TabBarIcon name="code" color={color} />
+                        <TabBarIcon name="home" color={color} />
                     ),
                     headerRight: () => (
                         <Pressable
@@ -160,7 +157,7 @@ function BottomTabNavigator() {
                 options={({ navigation }: RootTabScreenProps<'History'>) => ({
                     title: 'Histórico',
                     tabBarIcon: ({ color }) => (
-                        <TabBarIcon name="code" color={color} />
+                        <TabBarIcon name="trophy" color={color} />
                     ),
                     headerRight: () => (
                         <Pressable

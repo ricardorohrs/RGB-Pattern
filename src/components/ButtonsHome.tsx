@@ -32,6 +32,14 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
             >
                 Histórico
             </Button>
+
+            <Button
+                color={'#1e88e5'}
+                mode="outlined"
+                onPress={() => console.log('sair')}
+            >
+                Sair
+            </Button>
         </View>
     );
 }

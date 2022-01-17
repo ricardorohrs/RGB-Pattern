@@ -1,6 +1,8 @@
 import React from 'react';
 import {Image, ScrollView, StyleSheet, Text} from 'react-native';
 import {View} from '../components/Themed';
+import { FontAwesome } from "@expo/vector-icons";
+import { Button } from "react-native-paper";
 
 export default function HelpScreen({navigation}: { navigation: any }) {
 
@@ -50,11 +52,25 @@ export default function HelpScreen({navigation}: { navigation: any }) {
                 <View style={{backgroundColor: 'rgba(75, 225, 75, 0.5)', paddingBottom: 25}}>
                     <Text style={styles.question}>Posso solicitar ajuda se necessário?</Text>
                     <Text style={styles.answer}>
-                        Sim! Ao clicar no ícone de ajuda no (inserir onde vai ficar) da tela, será apresentada uma breve dica
-                        para auxiliar na resolução da questão, assim como quando o usuário responde incorretamente, um modal
-                        sugere a utilização da dica para facilitar na evolução do jogo. Lembrando que ao utilizar a dica, a
-                        quantidade de pontos recebidos é menor.
+                        Sim! No final da tela de pergunta, embaixo das opções, existe um botão de sugestão de ajuda
+                        (como no exemplo abaixo) será apresentada uma breve dica para auxiliar na resolução da questão,
+                        assim como quando o usuário responde incorretamente, um modal sugere a utilização da dica para
+                        facilitar na evolução do jogo. Lembrando que ao utilizar a dica, a quantidade de pontos
+                        recebidos é menor.
                     </Text>
+
+                    <Button
+                        color={"#a5a5a5"}
+                        labelStyle={{ marginTop: 12, fontSize: 10 }}
+                        mode="text"
+                        onPress={() => console.log('tela de ajuda')}
+                    >
+                        Gostaria de uma dica?&nbsp;
+                        <FontAwesome
+                            name="question-circle"
+                            size={13}
+                        />
+                    </Button>
                 </View>
             </View>
         </ScrollView>
