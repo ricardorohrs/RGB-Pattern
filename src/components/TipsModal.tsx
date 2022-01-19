@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import {Modal, StyleSheet, Text, View} from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { Button } from "react-native-paper";
+import React, { useState } from 'react';
+import { Modal, StyleSheet, Text, View } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { Button } from 'react-native-paper';
 
-export default function TipsModal({ tips }: { tips: string }) {
-
+export default function TipsModal({ tips }: { tips: Array<string> }) {
     const [modalVisible, setModalVisible] = useState(false);
+
+    const [currentTip, setCurrentTip] = useState(0);
 
     return (
         <View style={styles.centeredView}>
@@ -13,17 +14,26 @@ export default function TipsModal({ tips }: { tips: string }) {
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
-                onRequestClose={() => { setModalVisible(!modalVisible) }}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>{ tips } </Text>
-                        <Text style={{ fontSize: 8, marginBottom: 15 }}>-5 pontos</Text>
+                        <Text style={styles.modalText}>
+                            {tips[currentTip]}{' '}
+                        </Text>
+                        <Text style={{ fontSize: 8, marginBottom: 15 }}>
+                            -5 pontos
+                        </Text>
                         <Button
                             mode="contained"
-                            color={"#1e88e5"}
+                            color={'#1e88e5'}
                             labelStyle={{ fontSize: 10 }}
-                            onPress={() => setModalVisible(!modalVisible)}
+                            onPress={() => {
+                                setCurrentTip(currentTip + 1);
+                                setModalVisible(!modalVisible);
+                            }}
                         >
                             OK
                         </Button>
@@ -32,38 +42,34 @@ export default function TipsModal({ tips }: { tips: string }) {
             </Modal>
 
             <Button
-                color={"#a5a5a5"}
+                color={'#a5a5a5'}
                 labelStyle={{ fontSize: 10 }}
                 mode="text"
                 onPress={() => setModalVisible(true)}
             >
                 Gostaria de uma dica?&nbsp;
-                <FontAwesome
-                    name="question-circle"
-                    size={13}
-                />
+                <FontAwesome name="question-circle" size={13} />
             </Button>
-
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     centeredView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     modalView: {
         margin: 20,
-        backgroundColor: "white",
+        backgroundColor: 'white',
         borderRadius: 20,
         padding: 35,
-        alignItems: "center",
+        alignItems: 'center',
     },
     modalText: {
         fontFamily: 'space-mono',
         marginBottom: 15,
-        textAlign: "center"
-    }
+        textAlign: 'center',
+    },
 });

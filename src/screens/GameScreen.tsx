@@ -5,12 +5,16 @@ import { View } from '../components/Themed';
 import { Button } from 'react-native-paper';
 import { getProblem } from '../services/Problem';
 import AuthContext from '../contexts/authContext';
-import TipsModal from "../components/TipsModal";
+import TipsModal from '../components/TipsModal';
+
+import { createAnswer } from '../services/Answer';
 
 export default function GameScreen({ navigation }: { navigation: any }) {
     const { auth } = React.useContext(AuthContext) as any;
 
     const [problems, setProblems] = React.useState<any>(null);
+
+    const [currentProblem, setCurrentProblem] = React.useState<number>(0);
 
     React.useEffect(() => {
         const callApiFindAllProblems = async () => {
@@ -33,34 +37,95 @@ export default function GameScreen({ navigation }: { navigation: any }) {
         }
     }, []);
 
-    const tip = problems ? problems[0].tips : 'Não há dicas no momento.' as string;
+    // configurar usedTime, numberTipsUsed e points
+    const handleOption = async (problemId: number, isCorrect: boolean) => {
+        try {
+            let { status, message } = (await createAnswer(auth.data.token, {
+                usedTime: 200,
+                numberTipsUsed: 1,
+                isCorrect,
+                points: 110,
+                user: {
+                    id: auth.data.user.userId,
+                },
+                problem: {
+                    id: problemId,
+                },
+            })) as any;
+
+            if (status === 201) {
+                // setPopupTitle('Sucesso!');
+                // setPopupText('Resposta certa.');
+                // setPopup(true);
+                // setSuccess(1);
+            } else {
+                // setPopupTitle('Erro');
+                // setPopupText(
+                //     'Esta não é a resposta certa.'
+                // );
+                // setPopup(true);
+                // setSuccess(1);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const tips = problems
+        ? problems[currentProblem].tips
+        : ['Não há dicas no momento.'];
+
+    console.log('current index ' + currentProblem);
 
     return (
         <ScrollView>
             <View style={styles.container}>
-                <Text style={styles.question}>
-                    {problems && problems[0].description}
+                <Text
+                    key={`description-${currentProblem}`}
+                    style={styles.question}
+                >
+                    {problems && problems[currentProblem].description}
                 </Text>
                 {problems &&
-                    problems[0].options.map((option: any, index: number) => {
-                        return (
-                            <Button
-                                key={index}
-                                style={styles.options}
-                                color={'#1e88e5'}
-                                mode="contained"
-                                onPress={() => {
-                                    console.log(`Opção ${index}`);
-                                    console.log(problems);
-                                }}
-                            >
-                                {option}
-                            </Button>
-                        );
-                    })}
-            </View>
+                    problems[currentProblem].options.map(
+                        (option: any, index: number) => {
+                            return (
+                                <Button
+                                    key={index}
+                                    style={styles.options}
+                                    color={'#1e88e5'}
+                                    mode="contained"
+                                    onPress={() => {
+                                        if (
+                                            option ===
+                                            problems[currentProblem]
+                                                .correctAnswer
+                                        ) {
+                                            handleOption(
+                                                problems[currentProblem].id,
+                                                true
+                                            );
+                                            console.log('acertou');
 
-            <TipsModal tips={tip[0]}/>
+                                            setCurrentProblem(
+                                                currentProblem + 1
+                                            );
+                                        } else {
+                                            handleOption(
+                                                problems[currentProblem].id,
+                                                false
+                                            );
+                                            console.log('errou');
+                                        }
+                                    }}
+                                >
+                                    {option}
+                                </Button>
+                            );
+                        }
+                    )}
+            </View>
+            <TipsModal tips={tips} />
         </ScrollView>
     );
 }
