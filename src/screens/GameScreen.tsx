@@ -136,7 +136,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     question: {
-        color: '#FFF',
         fontSize: 24,
         fontFamily: 'space-mono',
         paddingHorizontal: 40,
