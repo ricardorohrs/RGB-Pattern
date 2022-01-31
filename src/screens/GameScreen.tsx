@@ -1,16 +1,22 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { View } from '../components/Themed';
-import {Button, Dialog, Modal, Portal, Provider} from 'react-native-paper';
+import { Button, Dialog, Modal, Portal, ProgressBar, Provider } from 'react-native-paper';
 import { getProblem } from '../services/Problem';
 import AuthContext from '../contexts/authContext';
 import TipsModal from '../components/TipsModal';
 
 import { createAnswer } from '../services/Answer';
+import { findAnswerFromUser } from "../services/User";
+import { AxiosResponse } from "axios";
 
 export default function GameScreen({ navigation }: { navigation: any }) {
     const { auth } = React.useContext(AuthContext) as any;
+    const [level, setLevel] = React.useState('');
+    const [points, setPoints] = React.useState(0);
+
+    const [rate, setRate] = React.useState(0);
 
     const [problems, setProblems] = React.useState<any>(null);
     const [option, setOption] = React.useState<any>(null);
@@ -95,14 +101,96 @@ export default function GameScreen({ navigation }: { navigation: any }) {
             handleOption(
                 problems[currentProblem].id,
                 true
-            ).then(r => console.log('acertou', r));
+            ).then(() => console.log('acertou'));
 
         } else {
             handleOption(
                 problems[currentProblem].id,
                 false
-            ).then(r => console.log('errou', r));
+            ).then(() => console.log('errou'));
         }
+    }
+
+    const nextLevel = (level: string) => {
+        return level === 'Estagiário' ? 'Júnior' : level === 'Júnior' ? 'Pleno' : level === 'Pleno' ? 'Sênior' : level === 'Sênior' ? 'Master' : level === 'Master' ? 'Especialista' : '';
+    };
+
+    React.useEffect(() => {
+        const callAPiFindAnswerFromUser = async () => {
+            const response = (await findAnswerFromUser(
+                auth.data.token,
+                auth.data.user.userId
+            )) as AxiosResponse;
+            const {message, payload} = response.data;
+
+            if (response.status !== 200) throw Error(message);
+
+            const {points, rate} = payload.reduce(
+                (acc: any, curr: any, index: number, arr: object[]) => {
+                    return {
+                        points: acc.points + curr.points,
+                        rate: (acc.points + curr.points) / arr.length,
+                    } || 0;
+                }, 0);
+
+            if (points >= 666) setLevel('Estagiário');
+            else if (points >= 1333) setLevel('Júnior');
+            else if (points >= 2000) setLevel('Pleno');
+            else if (points >= 2666) setLevel('Sênior');
+            else if (points >= 3333) setLevel('Master');
+            else if (points >= 4000) setLevel('Especialista');
+
+            setPoints(points);
+            setRate(rate);
+        };
+
+        try {
+            callAPiFindAnswerFromUser();
+        } catch (err) {
+            console.log(err);
+        }
+    }, [auth]);
+
+    const images = [
+        {
+            text: "Estagiário",
+            image: require('../../assets/images/levels/estagiario.png')
+        },
+        {
+            text: "Júnior",
+            image: require('../../assets/images/levels/junior.png')
+        },
+        {
+            text: "Pleno",
+            image: require('../../assets/images/levels/pleno.png')
+        },
+        {
+            text: "Sênior",
+            image: require('../../assets/images/levels/senior.png')
+        },
+        {
+            text: "Master",
+            image: require('../../assets/images/levels/master.png')
+        },
+        {
+            text: "Especialista",
+            image: require('../../assets/images/levels/especialista.png')
+        }
+    ];
+
+    const badges = (level: string) => {
+        if (level === 'Estagiário') return 0;
+        if (level === 'Júnior') return 1;
+        if (level === 'Pleno') return 2;
+        if (level === 'Sênior') return 3;
+        if (level === 'Master') return 4;
+        if (level === 'Especialista') return 5;
+        return 0;
+    };
+
+    const getNumberQuestion = (currentProblem: number) => {
+        let count = currentProblem + 1;
+        return count === 0 ? count + 2 : count + 1;
     }
 
     return (
@@ -133,8 +221,25 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                             );
                         }
                     )}
+
+                <TipsModal tips={tips}/>
+
+                <View style={styles.bottomBar}>
+                    <TouchableOpacity onPress={() => navigation.navigate('History')}>
+                        <Image
+                            style={{width: 50, resizeMode: 'contain', marginHorizontal: 50}}
+                            source={images[badges(level)].image}
+                        />
+                    </TouchableOpacity>
+                    <View style={{backgroundColor: '#0f0f0f'}}>
+                        <Text style={[styles.progress, {textAlign: 'left'}]}>{level ? level : 'Estagiário'}</Text>
+                        <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} style={{width: 200}}/>
+                        <Text style={[styles.progress, {textAlign: 'right'}]}>{`${nextLevel(
+                            level ? level : 'Estagiário'
+                        )}`}</Text>
+                    </View>
+                </View>
             </View>
-            <TipsModal tips={tips} />
 
             <Provider>
                 <Portal>
@@ -165,7 +270,10 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                 <Portal>
                     <Modal visible={correctAnswer} onDismiss={hideCorrectModal} contentContainerStyle={containerStyle}>
                         <View style={styles.modal}>
-                            <Text>Inserir insígnia aqui</Text>
+                            <Image
+                                style={styles.badge}
+                                source={images[badges(level)].image}
+                            />
                             <Text style={styles.alert}>Parabéns!</Text>
                             <Text style={styles.alert}>Resposta certa!</Text>
                             <Text style={styles.subAlert}>Você recebeu 100 pontos.</Text>
@@ -176,6 +284,7 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                                 onPress={() => {
                                     hideCorrectModal();
                                     setCurrentProblem(currentProblem + 1);
+                                    navigation.setOptions({title: 'Questão ' + getNumberQuestion(currentProblem)});
                                 }}>
                                 Próxima pergunta
                             </Button>
@@ -228,7 +337,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginTop: 5,
     },
-    subAlert:{
+    subAlert: {
         fontSize: 18,
         marginTop: 5,
     },
@@ -239,5 +348,21 @@ const styles = StyleSheet.create({
     confirmation: {
         padding: 10,
         marginTop: 25,
-    }
+    },
+    badge: {
+        marginBottom: 7,
+        width: 125,
+        resizeMode: 'contain',
+    },
+    progress: {
+        fontSize: 12,
+        fontFamily: 'space-mono',
+    },
+    bottomBar: {
+        backgroundColor: '#0f0f0f',
+        width: '100%',
+        height: '10%',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
 });

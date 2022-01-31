@@ -16,11 +16,6 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
 
     const { setAuthData } = React.useContext(AuthContext) as Auth;
 
-    const [popup, setPopup] = React.useState(false);
-    const [popupText, setPopupText] = React.useState('');
-    const [popupTitle, setPopupTitle] = React.useState('');
-    const [success] = React.useState(1);
-
     const handleSubmit = async () => {
         try {
             const { user, token } = await login(email, password);

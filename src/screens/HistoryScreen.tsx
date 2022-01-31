@@ -46,8 +46,7 @@ export default function HistoryScreen() {
                         points: acc.points + curr.points,
                         rate: (acc.points + curr.points) / arr.length,
                     };
-                }
-            );
+                }, 0);
 
             payload.map((curr: any) => {
                 if (curr.isCorrect) {
@@ -57,12 +56,12 @@ export default function HistoryScreen() {
                 }
             });
 
-            if (rate >= 25) setLevel('Estagiário');
-            else if (rate >= 50) setLevel('Júnior');
-            else if (rate >= 75) setLevel('Pleno');
-            else if (rate >= 100) setLevel('Sênior');
-            else if (rate >= 125) setLevel('Master');
-            else if (rate >= 150) setLevel('Especialista');
+            if (points >= 666) setLevel('Estagiário');
+            else if (points >= 1333) setLevel('Júnior');
+            else if (points >= 2000) setLevel('Pleno');
+            else if (points >= 2666) setLevel('Sênior');
+            else if (points >= 3333) setLevel('Master');
+            else if (points >= 4000) setLevel('Especialista');
 
             setPoints(points);
             setRate(rate);
@@ -160,25 +159,25 @@ export default function HistoryScreen() {
                     {`Olá, ${auth.data.user.userName}!`}
                 </Text>
                 <Text style={styles.subtitle}>
-                    {`Você esta no nível ${ level ? level : 'Estagiário'} com`}
+                    {`Você está no nível ${level ? level : 'Estagiário'} com`}
                 </Text>
-                <Text style={styles.score}>{`${points} pontos`}</Text>
+                <Text style={styles.score}>{`${points || 150} pontos`}</Text>
             </View>
 
             <View style={styles.card}>
-                <Text style={{ textAlign: 'left' }}>{ level ? level : 'Estagiário'}</Text>
-                <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} />
-                <Text style={{ textAlign: 'right' }}>{`${nextLevel(
+                <Text style={[styles.progress, {textAlign: 'left'}]}>{level ? level : 'Estagiário'}</Text>
+                <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'}/>
+                <Text style={[styles.progress, {textAlign: 'right'}]}>{`${nextLevel(
                     level ? level : 'Estagiário'
                 )} - ${points ?? 0} pontos`}</Text>
 
-                <Text style={{ paddingTop: 35 }}>Taxa de acertos:</Text>
-                <ProgressBar progress={0.5} color={'rgb(75,75,225)'} />
-                <Text style={{ textAlign: 'right' }}>
+                <Text style={[styles.progress, {paddingTop: 35}]}>Taxa de acertos:</Text>
+                <ProgressBar progress={0.5} color={'rgb(75,75,225)'}/>
+                <Text style={[styles.progress, {textAlign: 'right'}]}>
                     {`${corrects}/${corrects + incorrects} - ${(
                         corrects /
                         (corrects + incorrects)
-                    )
+                    ) || 0
                         .toString()
                         .replace('0.', '')}%`}
                 </Text>
@@ -226,14 +225,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     title: {
-        fontSize: 20,
+        fontFamily: 'space-mono',
+        fontSize: 22,
         paddingBottom: 10,
     },
     subtitle: {
-        fontSize: 16,
+        fontFamily: 'space-mono',
+        fontSize: 14,
     },
     score: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: 'bold',
+    },
+    progress: {
+        fontSize: 12,
+        fontFamily: 'space-mono',
     },
 });

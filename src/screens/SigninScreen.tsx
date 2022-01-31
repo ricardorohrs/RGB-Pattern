@@ -38,21 +38,9 @@ export default function SigninScreen({ navigation }: { navigation: any }) {
                 }
             } catch (error) {
                 console.log(error);
-                // setPopupTitle('Erro');
-                // setPopupText('Erro ao direcionar para login.');
-                // setPopup(true);
-                // setSuccess(1);
             }
-            // setPopupTitle('Sucesso');
-            // setPopupText('Usuário criado com sucesso.');
-            // setPopup(true);
-            // setSuccess(1);
         } catch (error) {
             console.log(error);
-            // setPopupTitle('Erro');
-            // setPopupText('Usuário não pode ser criada.');
-            // setPopup(true);
-            // setSuccess(1);
         }
     };
 
