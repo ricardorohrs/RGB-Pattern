@@ -16,8 +16,8 @@ export default function Header() {
             />
             <View
                 style={styles.separator}
-                lightColor="#eee"
-                darkColor="rgba(255,255,255,0.7)"
+                lightColor="#CCC"
+                darkColor="#FFF"
             />
         </View>
     );
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     },
     separator: {
         marginVertical: 30,
-        height: 1,
+        height: 1.2,
         width: '80%',
     },
 });

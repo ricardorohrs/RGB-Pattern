@@ -10,8 +10,11 @@ import TipsModal from '../components/TipsModal';
 import { createAnswer } from '../services/Answer';
 import { findAnswerFromUser } from "../services/User";
 import { AxiosResponse } from "axios";
+import useColorScheme from "../hooks/useColorScheme";
 
 export default function GameScreen({ navigation }: { navigation: any }) {
+    const colorScheme = useColorScheme();
+
     const { auth } = React.useContext(AuthContext) as any;
     const [level, setLevel] = React.useState('');
     const [points, setPoints] = React.useState(0);
@@ -31,8 +34,8 @@ export default function GameScreen({ navigation }: { navigation: any }) {
     const showCorrectModal = () => setCorrectAnswer(true);
     const hideCorrectModal = () => setCorrectAnswer(false);
     const containerStyle = {
-        backgroundColor: 'white',
-        padding: 40,
+        backgroundColor: colorScheme === 'light' ? 'white' : 'dark',
+        padding: 45,
     };
     const [wrongAnswer, setWrongAnswer] = React.useState(false);
     const showWrongModal = () => setWrongAnswer(true);
@@ -89,8 +92,6 @@ export default function GameScreen({ navigation }: { navigation: any }) {
     const tips = problems
         ? problems[currentProblem].tips
         : ['Não há dicas no momento.'];
-
-    // console.log('current index ' + currentProblem);
 
     const checkQuestion = (option: any, problems: any) => {
         if (
@@ -193,6 +194,10 @@ export default function GameScreen({ navigation }: { navigation: any }) {
         return count === 0 ? count + 2 : count + 1;
     }
 
+    const getColor = () => {
+        return colorScheme === 'dark' ? '#0f0f0f' : '#e3e3e3';
+    }
+
     return (
         <ScrollView>
             <View style={styles.container}>
@@ -224,14 +229,14 @@ export default function GameScreen({ navigation }: { navigation: any }) {
 
                 <TipsModal tips={tips}/>
 
-                <View style={styles.bottomBar}>
+                <View style={[styles.bottomBar, {backgroundColor: getColor()}]}>
                     <TouchableOpacity onPress={() => navigation.navigate('History')}>
                         <Image
                             style={{width: 50, resizeMode: 'contain', marginHorizontal: 50}}
                             source={images[badges(level)].image}
                         />
                     </TouchableOpacity>
-                    <View style={{backgroundColor: '#0f0f0f'}}>
+                    <View style={{backgroundColor: getColor()}}>
                         <Text style={[styles.progress, {textAlign: 'left'}]}>{level ? level : 'Estagiário'}</Text>
                         <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} style={{width: 200}}/>
                         <Text style={[styles.progress, {textAlign: 'right'}]}>{`${nextLevel(
@@ -322,10 +327,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     question: {
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'space-mono',
         paddingHorizontal: 40,
-        marginVertical: 70,
+        marginVertical: 50,
     },
     options: {
         width: 250,
@@ -350,7 +355,7 @@ const styles = StyleSheet.create({
         marginTop: 25,
     },
     badge: {
-        marginBottom: 7,
+        marginBottom: 10,
         width: 125,
         resizeMode: 'contain',
     },
@@ -359,7 +364,6 @@ const styles = StyleSheet.create({
         fontFamily: 'space-mono',
     },
     bottomBar: {
-        backgroundColor: '#0f0f0f',
         width: '100%',
         height: '10%',
         flexDirection: 'row',

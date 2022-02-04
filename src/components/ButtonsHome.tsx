@@ -9,7 +9,7 @@ import AuthContext from "../contexts/authContext";
 export default function ButtonsHome({ navigation }: { navigation: any }) {
 
     const [points, setPoints] = React.useState(0);
-    const {auth} = React.useContext(AuthContext) as any;
+    const {auth, setAuthData} = React.useContext(AuthContext) as any;
 
     React.useEffect(() => {
         const callAPiFindAnswerFromUser = async () => {
@@ -50,7 +50,7 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
                 Novo Jogo
             </Button>
 
-            {points ? (
+            { points ? (
                 <Button
                     style={styles.button}
                     color={'#1e88e5'}
@@ -73,7 +73,7 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
             <Button
                 color={'#1e88e5'}
                 mode="outlined"
-                onPress={() => console.log('sair')}
+                onPress={() => setAuthData({null: 'any'})}
             >
                 Sair
             </Button>
