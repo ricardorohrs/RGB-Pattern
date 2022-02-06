@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     Modal as ReactModal,
 } from 'react-native';
-
 import { View } from '../components/Themed';
 import {
     Button,
@@ -19,7 +18,6 @@ import {
 } from 'react-native-paper';
 import { getProblem } from '../services/Problem';
 import AuthContext from '../contexts/authContext';
-
 import { createAnswer } from '../services/Answer';
 import { deleteAnswersFromUser, findAnswerFromUser } from '../services/User';
 import { AxiosResponse } from 'axios';
@@ -34,41 +32,38 @@ export default function GameScreen({
     navigation: any;
 }) {
     const continueGame = route.params?.continueGame;
-
     const colorScheme = useColorScheme();
 
     const { auth } = React.useContext(AuthContext) as any;
     const [level, setLevel] = React.useState('');
     const [points, setPoints] = React.useState(0);
-
-    const [rate, setRate] = React.useState(0);
-
+    const [currentProblem, setCurrentProblem] = React.useState<number>(0);
     const [problems, setProblems] = React.useState<any>(null);
     const [option, setOption] = React.useState<any>(null);
 
-    const [currentProblem, setCurrentProblem] = React.useState<number>(0);
-
+    // confirma resposta
     const [checkAnswer, setCheckAnswer] = React.useState<boolean>(false);
     const showDialog = () => setCheckAnswer(true);
     const hideDialog = () => setCheckAnswer(false);
 
-    //resposta certa
+    // resposta certa
     const [correctAnswer, setCorrectAnswer] = React.useState(false);
     const showCorrectModal = () => setCorrectAnswer(true);
     const hideCorrectModal = () => setCorrectAnswer(false);
-    //resposta errada
+
+    // resposta errada
     const [wrongAnswer, setWrongAnswer] = React.useState(false);
     const showWrongModal = () => setWrongAnswer(true);
     const hideWrongModal = () => setWrongAnswer(false);
 
-    const [usedTips, setusedTips] = React.useState(false);
-
+    // modais
     const containerStyle = {
         backgroundColor: colorScheme === 'light' ? 'white' : 'dark',
         padding: 45,
     };
 
     // dicas
+    const [usedTips, setusedTips] = React.useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [currentTip, setCurrentTip] = useState(0);
 
@@ -83,10 +78,11 @@ export default function GameScreen({
             if (response.status !== 200) throw Error(message);
 
             const correctAnswer = payload.reduce((acc: any, curr: any) => {
-                return curr.isCorrect ? (acc = acc + 1) : acc;
+                return curr.isCorrect ? acc + 1 : acc;
             }, 0);
 
             setCurrentProblem(getNumberQuestion(correctAnswer));
+            navigation.setOptions({ title: 'Questão ' + getNumberQuestion(correctAnswer) });
         };
 
         const callApiDeleteAnswerFromUser = async () => {
@@ -180,7 +176,7 @@ export default function GameScreen({
             ? 'Master'
             : level === 'Master'
             ? 'Especialista'
-            : '';
+            : 'Campeão!';
     };
 
     React.useEffect(() => {
@@ -193,25 +189,23 @@ export default function GameScreen({
 
             if (response.status !== 200) throw Error(message);
 
-            const { points, rate } = payload.reduce(
-                (acc: any, curr: any, index: number, arr: object[]) => {
+            const { points } = payload.reduce(
+                (acc: any, curr: any) => {
                     return {
                         points: acc.points + curr.points,
-                        rate: (acc.points + curr.points) / arr.length,
                     };
                 },
-                { points: 0, rate: 0 }
+                { points: 0 }
             );
 
-            if (points >= 666) setLevel('Estagiário');
-            else if (points >= 1333) setLevel('Júnior');
-            else if (points >= 2000) setLevel('Pleno');
-            else if (points >= 2666) setLevel('Sênior');
-            else if (points >= 3333) setLevel('Master');
-            else if (points >= 4000) setLevel('Especialista');
+            if (points <= 666) setLevel('Estagiário');
+            else if (points <= 1333) setLevel('Júnior');
+            else if (points <= 2000) setLevel('Pleno');
+            else if (points <= 2666) setLevel('Sênior');
+            else if (points <= 3333) setLevel('Master');
+            else if (points <= 4000) setLevel('Especialista');
 
             setPoints(points);
-            setRate(rate);
         };
 
         try {
@@ -266,6 +260,22 @@ export default function GameScreen({
     const getColor = () => {
         return colorScheme === 'dark' ? '#0f0f0f' : '#e3e3e3';
     };
+
+    const getProgress = () => {
+        if (level === 'Estagiário') {
+            return ((points * 100) / 666) / 100;
+        } else if (level === 'Júnior') {
+            return ((points * 100) / 1333) / 100;
+        } else if (level === 'Pleno') {
+            return ((points * 100) / 2000) / 100;
+        } else if (level === 'Sênior') {
+            return ((points * 100) / 2666) / 100;
+        } else if (level === 'Master') {
+            return ((points * 100) / 3333) / 100;
+        } else if (level === 'Especialista') {
+            return ((points * 100) / 4000) / 100;
+        }
+    }
 
     return (
         <ScrollView>
@@ -364,7 +374,7 @@ export default function GameScreen({
                             {level ? level : 'Estagiário'}
                         </Text>
                         <ProgressBar
-                            progress={0.7}
+                            progress={getProgress()}
                             color={'rgb(75, 75, 225)'}
                             style={{ width: 200 }}
                         />
@@ -493,9 +503,10 @@ const styles = StyleSheet.create({
         fontFamily: 'space-mono',
         paddingHorizontal: 40,
         marginVertical: 50,
+        textAlign: 'justify',
     },
     options: {
-        maxWidth: 350,
+        width: 350,
         padding: 10,
         marginBottom: 25,
     },

@@ -75,7 +75,7 @@ function RootNavigator() {
             />
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
                 <Stack.Screen name="Game" component={GameScreen}  options={({ navigation }: RootStackScreenProps<'Game'>) => ({
-                    title: 'Questão 1',
+                    title: 'Questão',
                     headerRight: () => (
                         <Pressable
                             onPress={() => navigation.navigate('Ajuda')}

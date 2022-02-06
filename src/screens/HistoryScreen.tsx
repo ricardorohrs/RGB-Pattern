@@ -2,9 +2,7 @@ import * as React from 'react';
 import { Image, ScrollView, StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { ProgressBar } from 'react-native-paper';
-
 import { AxiosResponse } from 'axios';
-
 import AuthContext from '../contexts/authContext';
 import { findAnswerFromUser } from '../services/User';
 
@@ -18,13 +16,11 @@ const levels = [
 ];
 
 export default function HistoryScreen() {
-    const [level, setLevel] = React.useState('');
+    const [rate, setRate] = React.useState(0);
     const [points, setPoints] = React.useState(0);
     const [corrects, setCorrects] = React.useState(0);
     const [incorrects, setIncorrects] = React.useState(0);
-
-    // estado calculado a partir da soma de pts / quantidade de respostas
-    const [rate, setRate] = React.useState(0);
+    const [level, setLevel] = React.useState('Estagiário');
 
     const { auth } = React.useContext(AuthContext) as any;
 
@@ -57,15 +53,18 @@ export default function HistoryScreen() {
 
             if (response.status !== 200) throw Error(message);
 
-            const { points, rate } = payload.reduce(
-                (acc: any, curr: any, index: number, arr: object[]) => {
+            const { points } = payload.reduce(
+                (acc: any, curr: any) => {
                     return {
                         points: acc.points + curr.points,
-                        rate: (acc.points + curr.points) / arr.length,
                     };
                 },
-                { points: 0, rate: 0 }
+                { points: 0 }
             );
+
+            const correctAnswer = payload.reduce((acc: any, curr: any) => {
+                return curr.isCorrect ? acc + 1 : acc;
+            }, 0);
 
             payload.map((curr: any) => {
                 if (curr.isCorrect) {
@@ -75,15 +74,15 @@ export default function HistoryScreen() {
                 }
             });
 
-            if (points >= 666) setLevel('Estagiário');
-            else if (points >= 1333) setLevel('Júnior');
-            else if (points >= 2000) setLevel('Pleno');
-            else if (points >= 2666) setLevel('Sênior');
-            else if (points >= 3333) setLevel('Master');
-            else if (points >= 4000) setLevel('Especialista');
+            if (points <= 666) setLevel('Estagiário');
+            else if (points <= 1333) setLevel('Júnior');
+            else if (points <= 2000) setLevel('Pleno');
+            else if (points <= 2666) setLevel('Sênior');
+            else if (points <= 3333) setLevel('Master');
+            else if (points <= 4000) setLevel('Especialista');
 
             setPoints(points);
-            setRate(rate);
+            setRate(Math.trunc((correctAnswer * 100) / payload.length));
         };
 
         try {
@@ -92,6 +91,22 @@ export default function HistoryScreen() {
             console.log(err);
         }
     }, [auth]);
+
+    const getProgress = () => {
+        if (level === 'Estagiário') {
+            return ((points * 100) / 666) / 100;
+        } else if (level === 'Júnior') {
+            return ((points * 100) / 1333) / 100;
+        } else if (level === 'Pleno') {
+            return ((points * 100) / 2000) / 100;
+        } else if (level === 'Sênior') {
+            return ((points * 100) / 2666) / 100;
+        } else if (level === 'Master') {
+            return ((points * 100) / 3333) / 100;
+        } else if (level === 'Especialista') {
+            return ((points * 100) / 4000) / 100;
+        }
+    }
 
     const B = (props: any) => (
         <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
@@ -205,7 +220,7 @@ export default function HistoryScreen() {
                 <Text style={[styles.progress, { textAlign: 'left' }]}>
                     {level ? level : 'Estagiário'}
                 </Text>
-                <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} />
+                <ProgressBar progress={getProgress()} color={'rgb(75, 75, 225)'} />
                 <Text
                     style={[styles.progress, { textAlign: 'right' }]}
                 >{`${nextLevel(level ? level : 'Estagiário')} - ${
@@ -215,12 +230,9 @@ export default function HistoryScreen() {
                 <Text style={[styles.progress, { paddingTop: 35 }]}>
                     Taxa de acertos:
                 </Text>
-                <ProgressBar progress={0.5} color={'rgb(75,75,225)'} />
+                <ProgressBar progress={rate/100} color={'rgb(75,75,225)'} />
                 <Text style={[styles.progress, { textAlign: 'right' }]}>
-                    {`${corrects}/${corrects + incorrects} - ${
-                        corrects / (corrects + incorrects) ||
-                        (0).toString().replace('0.', '')
-                    }%`}
+                    {`${corrects}/${corrects + incorrects} - ${rate}%`}
                 </Text>
             </View>
         </ScrollView>
