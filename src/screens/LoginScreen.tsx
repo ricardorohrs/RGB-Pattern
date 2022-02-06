@@ -1,12 +1,9 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
-
 import { View } from '../components/Themed';
 import Header from '../components/Header';
-
 import { login } from '../services/Auth';
-
 import AuthContext from '../contexts/authContext';
 import { Auth } from '../contexts/authContext';
 

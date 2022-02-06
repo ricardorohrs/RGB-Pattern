@@ -3,10 +3,8 @@ import { StyleSheet } from 'react-native';
 import { View } from '../components/Themed';
 import { Button, TextInput } from 'react-native-paper';
 import Header from '../components/Header';
-
 import { createUser } from '../services/User';
 import { login } from '../services/Auth';
-
 import AuthContext from '../contexts/authContext';
 import { Auth } from '../contexts/authContext';
 

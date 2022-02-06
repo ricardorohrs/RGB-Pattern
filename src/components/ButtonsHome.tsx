@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import {ScrollView, StyleSheet, Text} from 'react-native';
+import {Button, Dialog, Portal, Provider} from 'react-native-paper';
 import { View } from './Themed';
 import { findAnswerFromUser } from '../services/User';
 import { AxiosResponse } from 'axios';
@@ -13,6 +13,10 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
     const [points, setPoints] = React.useState(0);
     const { auth, setAuthData } = React.useContext(AuthContext) as any;
 
+    const [checkAnswer, setCheckAnswer] = React.useState<boolean>(false);
+    const showDialog = () => setCheckAnswer(true);
+    const hideDialog = () => setCheckAnswer(false);
+
     React.useEffect(() => {
         const callAPiFindAnswerFromUser = async () => {
             const response = (await findAnswerFromUser(
@@ -23,11 +27,10 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
 
             if (response.status !== 200) throw Error(message);
 
-            const { points, rate } = payload.reduce(
-                (acc: any, curr: any, index: number, arr: object[]) => {
+            const { points } = payload.reduce(
+                (acc: any, curr: any) => {
                     return {
                         points: acc.points + curr.points,
-                        rate: (acc.points + curr.points) / arr.length,
                     };
                 },
                 { points: 0, rate: 0 }
@@ -44,12 +47,15 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
     }, [auth, isFocused]);
 
     return (
-        <View style={styles.container}>
+        <ScrollView>
+            <View style={styles.container}>
             <Button
                 style={styles.button}
                 color={'#1e88e5'}
                 mode="contained"
-                onPress={() => navigation.navigate('Game')}
+                onPress={() => {
+                    points ? showDialog() : navigation.navigate('Game');
+                }}
             >
                 Novo Jogo
             </Button>
@@ -84,6 +90,57 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
                 Sair
             </Button>
         </View>
+
+            <Provider>
+                <Portal>
+                    <Dialog visible={checkAnswer} onDismiss={hideDialog}>
+                        <Text
+                            style={{
+                                display: 'flex',
+                                textAlign: 'center',
+                                fontSize: 20,
+                                paddingHorizontal: 26,
+                                marginVertical: 15,
+                            }}
+                        >
+                            Tem certeza que deseja reiniciar o jogo?
+                        </Text>
+                        <Text style={{
+                            display: 'flex',
+                            textAlign: 'center',
+                            fontSize: 18,
+                            marginVertical: 15,
+                            fontWeight: 'bold',
+                        }}>
+                            Seu progresso será perdido.
+                        </Text>
+                        <Dialog.Actions>
+                            <Button
+                                color={'#1e88e5'}
+                                mode="contained"
+                                style={{ width: 100, padding: 5, margin: 10 }}
+                                onPress={() => {
+                                    hideDialog();
+                                }}
+                            >
+                                Não
+                            </Button>
+                            <Button
+                                color={'#1e88e5'}
+                                mode="contained"
+                                style={{ width: 100, padding: 5, margin: 10 }}
+                                onPress={() => {
+                                    hideDialog();
+                                    navigation.navigate('Game');
+                                }}
+                            >
+                                Sim
+                            </Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
+            </Provider>
+    </ScrollView>
     );
 }
 

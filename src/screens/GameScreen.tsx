@@ -11,7 +11,6 @@ import { View } from '../components/Themed';
 import {
     Button,
     Dialog,
-    Modal,
     Portal,
     ProgressBar,
     Provider,
@@ -21,7 +20,6 @@ import AuthContext from '../contexts/authContext';
 import { createAnswer } from '../services/Answer';
 import { deleteAnswersFromUser, findAnswerFromUser } from '../services/User';
 import { AxiosResponse } from 'axios';
-import useColorScheme from '../hooks/useColorScheme';
 import { FontAwesome } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -33,9 +31,7 @@ export default function GameScreen({
     navigation: any;
 }) {
     const isFocused = useIsFocused();
-
     const continueGame = route.params?.continueGame;
-    const colorScheme = useColorScheme();
 
     const { auth } = React.useContext(AuthContext) as any;
     const [level, setLevel] = React.useState('');
@@ -49,6 +45,11 @@ export default function GameScreen({
     const showDialog = () => setCheckAnswer(true);
     const hideDialog = () => setCheckAnswer(false);
 
+    // final de jogo
+    const [finalModal, setFinalModal] = React.useState(false);
+    const showFinalModal = () => setFinalModal(true);
+    const hideFinalModal = () => setFinalModal(false);
+
     // resposta certa
     const [correctAnswer, setCorrectAnswer] = React.useState(false);
     const showCorrectModal = () => setCorrectAnswer(true);
@@ -60,7 +61,7 @@ export default function GameScreen({
     const hideWrongModal = () => setWrongAnswer(false);
 
     // dicas
-    const [usedTips, setusedTips] = React.useState(false);
+    const [usedTips, setUsedTips] = React.useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [currentTip, setCurrentTip] = useState(0);
 
@@ -78,7 +79,7 @@ export default function GameScreen({
                 return curr.isCorrect ? acc + 1 : acc;
             }, 0);
 
-            setCurrentProblem(getNumberQuestion(correctAnswer));
+            setCurrentProblem(getNumberQuestion(correctAnswer)-1);
             navigation.setOptions({
                 title: 'Questão ' + getNumberQuestion(correctAnswer),
             });
@@ -93,7 +94,7 @@ export default function GameScreen({
 
             if (response.status !== 200) throw Error(message);
 
-            setCurrentProblem(0);
+            // setCurrentProblem(0);
         };
 
         try {
@@ -128,9 +129,9 @@ export default function GameScreen({
         }
     }, []);
 
-    const [finalPoints, setfinalPoints] = React.useState(166);
+    const [finalPoints, setFinalPoints] = React.useState(166);
     const handleOption = async (problemId: number, isCorrect: boolean) => {
-        setfinalPoints(usedTips ? 150 : 166);
+        setFinalPoints(usedTips ? 150 : 166);
         const tips = usedTips ? 1 : 0;
 
         try {
@@ -162,7 +163,7 @@ export default function GameScreen({
     const checkQuestion = async (option: any, problems: any) => {
         if (option === problems[currentProblem].correctAnswer) {
             await handleOption(problems[currentProblem].id, true);
-            setusedTips(false);
+            setUsedTips(false);
         } else {
             await handleOption(problems[currentProblem].id, false);
         }
@@ -216,7 +217,7 @@ export default function GameScreen({
         } catch (err) {
             console.log(err);
         }
-    }, [auth]);
+    }, [auth, isFocused]);
 
     const images = [
         {
@@ -256,8 +257,7 @@ export default function GameScreen({
     };
 
     const getNumberQuestion = (currentProblem: number) => {
-        let count = currentProblem + 1;
-        return count === 0 ? count + 2 : count + 1;
+        return currentProblem === 0 ? currentProblem + 2 : currentProblem + 1;
     };
 
     const getProgress = () => {
@@ -344,7 +344,7 @@ export default function GameScreen({
                         labelStyle={{ fontSize: 10 }}
                         mode="text"
                         onPress={() => {
-                            setusedTips(true);
+                            setUsedTips(true);
                             setModalVisible(true);
                         }}
                     >
@@ -447,16 +447,52 @@ export default function GameScreen({
                             color={'#1e88e5'}
                             mode="contained"
                             onPress={() => {
-                                hideCorrectModal();
-                                setCurrentProblem(currentProblem + 1);
-                                navigation.setOptions({
-                                    title:
-                                        'Questão ' +
-                                        getNumberQuestion(currentProblem),
-                                });
+                                if (currentProblem === 23) {
+                                    showFinalModal();
+                                } else {
+                                    hideCorrectModal();
+                                    setCurrentProblem(currentProblem + 1);
+                                    navigation.setOptions({
+                                        title:
+                                            'Questão ' +
+                                            getNumberQuestion(currentProblem),
+                                    });
+                                }
                             }}
                         >
                             Próxima pergunta
+                        </Button>
+                    </View>
+                </View>
+            </ReactModal>
+
+            <ReactModal
+                animationType="slide"
+                transparent={true}
+                visible={finalModal}
+                hardwareAccelerated={true}
+                onRequestClose={() => {
+                    hideCorrectModal();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Image
+                            style={styles.badge}
+                            source={images[badges('Especialista')].image}
+                        />
+                        <Text style={styles.alert}>Parabéns!</Text>
+                        <Text style={styles.subAlert}>Você finalizou o jogo e é um especialista em Padrões de Projeto!</Text>
+                        <Button
+                            style={styles.confirmation}
+                            color={'#1e88e5'}
+                            mode="contained"
+                            onPress={() => {
+                                hideFinalModal();
+                                navigation.navigate('Home');
+                            }}
+                        >
+                            Ok
                         </Button>
                     </View>
                 </View>
@@ -511,10 +547,11 @@ const styles = StyleSheet.create({
     },
     alert: {
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 24,
         marginTop: 5,
     },
     subAlert: {
+        textAlign: 'center',
         fontSize: 18,
         marginTop: 5,
     },

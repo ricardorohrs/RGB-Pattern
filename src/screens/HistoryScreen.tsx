@@ -29,7 +29,7 @@ export default function HistoryScreen() {
             ? 'Master'
             : level === 'Master'
             ? 'Especialista'
-            : '';
+            : 'Campeão!';
     };
 
     React.useEffect(() => {
