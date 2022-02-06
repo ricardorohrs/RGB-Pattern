@@ -17,11 +17,15 @@
         },
         "assetBundlePatterns": ["**/*"],
         "ios": {
+            "bundleIdentifier": "com.rgbpattern.rgbpattern",
+            "buildNumber": "1.0.0",
             "supportsTablet": true
         },
         "android": {
+            "package": "com.rgbpattern.rgbpattern",
+            "versionCode": 1,
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/logo_name.png",
+                "foregroundImage": "./assets/images/logo.png",
                 "backgroundColor": "#ffffff"
             }
         },

@@ -22,6 +22,7 @@ import { deleteAnswersFromUser, findAnswerFromUser } from '../services/User';
 import { AxiosResponse } from 'axios';
 import { FontAwesome } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
+import useColorScheme from "../hooks/useColorScheme";
 
 export default function GameScreen({
     route,
@@ -31,6 +32,7 @@ export default function GameScreen({
     navigation: any;
 }) {
     const isFocused = useIsFocused();
+    const colorScheme = useColorScheme();
     const continueGame = route.params?.continueGame;
 
     const { auth } = React.useContext(AuthContext) as any;
@@ -281,7 +283,7 @@ export default function GameScreen({
             <View style={styles.container}>
                 <Text
                     key={`description-${currentProblem}`}
-                    style={styles.question}
+                    style={[styles.question, {color: colorScheme === 'dark' ? '#FFF' : '#000'}]}
                 >
                     {problems && problems[currentProblem].description}
                 </Text>
