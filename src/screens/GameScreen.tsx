@@ -96,8 +96,6 @@ export default function GameScreen({
             )) as AxiosResponse;
             const { message } = response.data;
 
-            console.log('sdhusadhui');
-
             if (response.status !== 200) throw Error(message);
 
             setCurrentProblem(0);
@@ -162,15 +160,12 @@ export default function GameScreen({
         }
     };
 
-    const checkQuestion = (option: any, problems: any) => {
+    const checkQuestion = async (option: any, problems: any) => {
         if (option === problems[currentProblem].correctAnswer) {
-            handleOption(problems[currentProblem].id, true).then(() =>
-                setusedTips(false)
-            );
+            await handleOption(problems[currentProblem].id, true);
+            setusedTips(false);
         } else {
-            handleOption(problems[currentProblem].id, false).then(() =>
-                console.log('errou')
-            );
+            await handleOption(problems[currentProblem].id, false);
         }
     };
 
