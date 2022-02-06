@@ -33,3 +33,16 @@ export const findAnswerFromUser = async (token: string, userId: string) => {
         return err;
     }
 };
+
+export const deleteAnswersFromUser = async (token: string, userId: string) => {
+    try {
+        return await Axios.delete(
+            `${apiUrl}/users/${userId}/answers/deleteAnswerFromUser`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+    } catch (err) {
+        return err;
+    }
+};

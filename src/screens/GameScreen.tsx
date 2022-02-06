@@ -1,18 +1,40 @@
-import React, {useState} from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, Modal as ReactModal } from 'react-native';
+import React, { useState } from 'react';
+import {
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    Modal as ReactModal,
+} from 'react-native';
 
 import { View } from '../components/Themed';
-import { Button, Dialog, Modal, Portal, ProgressBar, Provider } from 'react-native-paper';
+import {
+    Button,
+    Dialog,
+    Modal,
+    Portal,
+    ProgressBar,
+    Provider,
+} from 'react-native-paper';
 import { getProblem } from '../services/Problem';
 import AuthContext from '../contexts/authContext';
 
 import { createAnswer } from '../services/Answer';
-import { findAnswerFromUser } from "../services/User";
-import { AxiosResponse } from "axios";
-import useColorScheme from "../hooks/useColorScheme";
-import {FontAwesome} from "@expo/vector-icons";
+import { deleteAnswersFromUser, findAnswerFromUser } from '../services/User';
+import { AxiosResponse } from 'axios';
+import useColorScheme from '../hooks/useColorScheme';
+import { FontAwesome } from '@expo/vector-icons';
 
-export default function GameScreen({ navigation }: { navigation: any }) {
+export default function GameScreen({
+    route,
+    navigation,
+}: {
+    route: any;
+    navigation: any;
+}) {
+    const continueGame = route.params?.continueGame;
+
     const colorScheme = useColorScheme();
 
     const { auth } = React.useContext(AuthContext) as any;
@@ -39,6 +61,8 @@ export default function GameScreen({ navigation }: { navigation: any }) {
     const showWrongModal = () => setWrongAnswer(true);
     const hideWrongModal = () => setWrongAnswer(false);
 
+    const [usedTips, setusedTips] = React.useState(false);
+
     const containerStyle = {
         backgroundColor: colorScheme === 'light' ? 'white' : 'dark',
         padding: 45,
@@ -47,6 +71,45 @@ export default function GameScreen({ navigation }: { navigation: any }) {
     // dicas
     const [modalVisible, setModalVisible] = useState(false);
     const [currentTip, setCurrentTip] = useState(0);
+
+    React.useEffect(() => {
+        const callAPiFindAnswerFromUser = async () => {
+            const response = (await findAnswerFromUser(
+                auth.data.token,
+                auth.data.user.userId
+            )) as AxiosResponse;
+            const { message, payload } = response.data;
+
+            if (response.status !== 200) throw Error(message);
+
+            const correctAnswer = payload.reduce((acc: any, curr: any) => {
+                return curr.isCorrect ? (acc = acc + 1) : acc;
+            }, 0);
+
+            setCurrentProblem(getNumberQuestion(correctAnswer));
+        };
+
+        const callApiDeleteAnswerFromUser = async () => {
+            const response = (await deleteAnswersFromUser(
+                auth.data.token,
+                auth.data.user.userId
+            )) as AxiosResponse;
+            const { message } = response.data;
+
+            console.log('sdhusadhui');
+
+            if (response.status !== 200) throw Error(message);
+
+            setCurrentProblem(0);
+        };
+
+        try {
+            if (continueGame) callAPiFindAnswerFromUser();
+            else callApiDeleteAnswerFromUser();
+        } catch (err) {
+            console.log(err);
+        }
+    }, [auth]);
 
     React.useEffect(() => {
         const callApiFindAllProblems = async () => {
@@ -69,17 +132,12 @@ export default function GameScreen({ navigation }: { navigation: any }) {
         }
     }, []);
 
-    const [usedTips, setusedTips] = React.useState(false);
-
-    // configurar usedTime, numberTipsUsed e points
     const handleOption = async (problemId: number, isCorrect: boolean) => {
         const points = usedTips ? 150 : 166;
         const tips = usedTips ? 1 : 0;
-        console.log('tips', tips);
-        console.log('points', points);
 
         try {
-            let { status, message } = (await createAnswer(auth.data.token, {
+            const response = (await createAnswer(auth.data.token, {
                 usedTime: 200,
                 numberTipsUsed: tips,
                 isCorrect,
@@ -92,42 +150,42 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                 },
             })) as any;
 
+            if (response.status !== 201) throw Error(response.data.message);
+
             if (isCorrect) {
                 showCorrectModal();
             } else {
                 showWrongModal();
             }
-
         } catch (e) {
             console.log(e);
         }
     };
 
-    const tips = problems
-        ? problems[currentProblem].tips
-        : ['Não há dicas no momento.'];
-
     const checkQuestion = (option: any, problems: any) => {
-        if (
-            option ===
-            problems[currentProblem]
-                .correctAnswer
-        ) {
-            handleOption(
-                problems[currentProblem].id,
-                true
-            ).then(() => setusedTips(false));
-
+        if (option === problems[currentProblem].correctAnswer) {
+            handleOption(problems[currentProblem].id, true).then(() =>
+                setusedTips(false)
+            );
         } else {
-            handleOption(
-                problems[currentProblem].id,
-                false
-            ).then(() => console.log('errou'));
+            handleOption(problems[currentProblem].id, false).then(() =>
+                console.log('errou')
+            );
         }
-    }
+    };
 
     const nextLevel = (level: string) => {
-        return level === 'Estagiário' ? 'Júnior' : level === 'Júnior' ? 'Pleno' : level === 'Pleno' ? 'Sênior' : level === 'Sênior' ? 'Master' : level === 'Master' ? 'Especialista' : '';
+        return level === 'Estagiário'
+            ? 'Júnior'
+            : level === 'Júnior'
+            ? 'Pleno'
+            : level === 'Pleno'
+            ? 'Sênior'
+            : level === 'Sênior'
+            ? 'Master'
+            : level === 'Master'
+            ? 'Especialista'
+            : '';
     };
 
     React.useEffect(() => {
@@ -136,17 +194,19 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                 auth.data.token,
                 auth.data.user.userId
             )) as AxiosResponse;
-            const {message, payload} = response.data;
+            const { message, payload } = response.data;
 
             if (response.status !== 200) throw Error(message);
 
-            const {points, rate} = payload.reduce(
+            const { points, rate } = payload.reduce(
                 (acc: any, curr: any, index: number, arr: object[]) => {
                     return {
                         points: acc.points + curr.points,
                         rate: (acc.points + curr.points) / arr.length,
-                    } || 0;
-                }, 0);
+                    };
+                },
+                { points: 0, rate: 0 }
+            );
 
             if (points >= 666) setLevel('Estagiário');
             else if (points >= 1333) setLevel('Júnior');
@@ -168,29 +228,29 @@ export default function GameScreen({ navigation }: { navigation: any }) {
 
     const images = [
         {
-            text: "Estagiário",
-            image: require('../../assets/images/levels/estagiario.png')
+            text: 'Estagiário',
+            image: require('../../assets/images/levels/estagiario.png'),
         },
         {
-            text: "Júnior",
-            image: require('../../assets/images/levels/junior.png')
+            text: 'Júnior',
+            image: require('../../assets/images/levels/junior.png'),
         },
         {
-            text: "Pleno",
-            image: require('../../assets/images/levels/pleno.png')
+            text: 'Pleno',
+            image: require('../../assets/images/levels/pleno.png'),
         },
         {
-            text: "Sênior",
-            image: require('../../assets/images/levels/senior.png')
+            text: 'Sênior',
+            image: require('../../assets/images/levels/senior.png'),
         },
         {
-            text: "Master",
-            image: require('../../assets/images/levels/master.png')
+            text: 'Master',
+            image: require('../../assets/images/levels/master.png'),
         },
         {
-            text: "Especialista",
-            image: require('../../assets/images/levels/especialista.png')
-        }
+            text: 'Especialista',
+            image: require('../../assets/images/levels/especialista.png'),
+        },
     ];
 
     const badges = (level: string) => {
@@ -206,11 +266,11 @@ export default function GameScreen({ navigation }: { navigation: any }) {
     const getNumberQuestion = (currentProblem: number) => {
         let count = currentProblem + 1;
         return count === 0 ? count + 2 : count + 1;
-    }
+    };
 
     const getColor = () => {
         return colorScheme === 'dark' ? '#0f0f0f' : '#e3e3e3';
-    }
+    };
 
     return (
         <ScrollView>
@@ -253,7 +313,9 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
                                 <Text style={styles.modalText}>
-                                    {problems ? problems[currentProblem].tips : null}{' '}
+                                    {problems
+                                        ? problems[currentProblem].tips
+                                        : null}{' '}
                                 </Text>
                                 <Text style={{ fontSize: 8, marginBottom: 15 }}>
                                     -10% dos pontos
@@ -287,19 +349,33 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                     </Button>
                 </View>
 
-                <View style={[styles.bottomBar, {backgroundColor: getColor()}]}>
-                    <TouchableOpacity onPress={() => navigation.navigate('History')}>
+                <View
+                    style={[styles.bottomBar, { backgroundColor: getColor() }]}
+                >
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('History')}
+                    >
                         <Image
-                            style={{width: 50, resizeMode: 'contain', marginHorizontal: 50}}
+                            style={{
+                                width: 50,
+                                resizeMode: 'contain',
+                                marginHorizontal: 50,
+                            }}
                             source={images[badges(level)].image}
                         />
                     </TouchableOpacity>
-                    <View style={{backgroundColor: getColor()}}>
-                        <Text style={[styles.progress, {textAlign: 'left'}]}>{level ? level : 'Estagiário'}</Text>
-                        <ProgressBar progress={0.7} color={'rgb(75, 75, 225)'} style={{width: 200}}/>
-                        <Text style={[styles.progress, {textAlign: 'right'}]}>{`${nextLevel(
-                            level ? level : 'Estagiário'
-                        )}`}</Text>
+                    <View style={{ backgroundColor: getColor() }}>
+                        <Text style={[styles.progress, { textAlign: 'left' }]}>
+                            {level ? level : 'Estagiário'}
+                        </Text>
+                        <ProgressBar
+                            progress={0.7}
+                            color={'rgb(75, 75, 225)'}
+                            style={{ width: 200 }}
+                        />
+                        <Text
+                            style={[styles.progress, { textAlign: 'right' }]}
+                        >{`${nextLevel(level ? level : 'Estagiário')}`}</Text>
                     </View>
                 </View>
             </View>
@@ -307,23 +383,38 @@ export default function GameScreen({ navigation }: { navigation: any }) {
             <Provider>
                 <Portal>
                     <Dialog visible={checkAnswer} onDismiss={hideDialog}>
-                        <Text style={{display: 'flex', textAlign: 'center', fontSize: 20, marginVertical: 15}}>
+                        <Text
+                            style={{
+                                display: 'flex',
+                                textAlign: 'center',
+                                fontSize: 20,
+                                marginVertical: 15,
+                            }}
+                        >
                             Deseja confirmar esta resposta?
                         </Text>
                         <Dialog.Actions>
-                            <Button color={'#1e88e5'}
-                                    mode="contained"
-                                    style={{width: 100, padding: 5, margin: 10}}
-                                    onPress={() => {
-                                        hideDialog();
-                                    }}>Não</Button>
-                            <Button color={'#1e88e5'}
-                                    mode="contained"
-                                    style={{width: 100, padding: 5, margin: 10}}
-                                    onPress={() => {
-                                        hideDialog();
-                                        checkQuestion(option, problems);
-                                    }}>Sim</Button>
+                            <Button
+                                color={'#1e88e5'}
+                                mode="contained"
+                                style={{ width: 100, padding: 5, margin: 10 }}
+                                onPress={() => {
+                                    hideDialog();
+                                }}
+                            >
+                                Não
+                            </Button>
+                            <Button
+                                color={'#1e88e5'}
+                                mode="contained"
+                                style={{ width: 100, padding: 5, margin: 10 }}
+                                onPress={() => {
+                                    hideDialog();
+                                    checkQuestion(option, problems);
+                                }}
+                            >
+                                Sim
+                            </Button>
                         </Dialog.Actions>
                     </Dialog>
                 </Portal>
@@ -331,7 +422,11 @@ export default function GameScreen({ navigation }: { navigation: any }) {
 
             <Provider>
                 <Portal>
-                    <Modal visible={correctAnswer} onDismiss={hideCorrectModal} contentContainerStyle={containerStyle}>
+                    <Modal
+                        visible={correctAnswer}
+                        onDismiss={hideCorrectModal}
+                        contentContainerStyle={containerStyle}
+                    >
                         <View style={styles.modal}>
                             <Image
                                 style={styles.badge}
@@ -339,7 +434,9 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                             />
                             <Text style={styles.alert}>Parabéns!</Text>
                             <Text style={styles.alert}>Resposta certa!</Text>
-                            <Text style={styles.subAlert}>Você recebeu 100 pontos.</Text>
+                            <Text style={styles.subAlert}>
+                                Você recebeu 100 pontos.
+                            </Text>
                             <Button
                                 style={styles.confirmation}
                                 color={'#1e88e5'}
@@ -347,8 +444,13 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                                 onPress={() => {
                                     hideCorrectModal();
                                     setCurrentProblem(currentProblem + 1);
-                                    navigation.setOptions({title: 'Questão ' + getNumberQuestion(currentProblem)});
-                                }}>
+                                    navigation.setOptions({
+                                        title:
+                                            'Questão ' +
+                                            getNumberQuestion(currentProblem),
+                                    });
+                                }}
+                            >
                                 Próxima pergunta
                             </Button>
                         </View>
@@ -358,17 +460,24 @@ export default function GameScreen({ navigation }: { navigation: any }) {
 
             <Provider>
                 <Portal>
-                    <Modal visible={wrongAnswer} onDismiss={hideWrongModal} contentContainerStyle={containerStyle}>
+                    <Modal
+                        visible={wrongAnswer}
+                        onDismiss={hideWrongModal}
+                        contentContainerStyle={containerStyle}
+                    >
                         <View style={styles.modal}>
                             <Text style={styles.alert}>Resposta errada!</Text>
-                            <Text style={styles.subAlert}>Tente novamente!</Text>
+                            <Text style={styles.subAlert}>
+                                Tente novamente!
+                            </Text>
                             <Button
                                 style={styles.confirmation}
                                 color={'#1e88e5'}
                                 mode="contained"
                                 onPress={() => {
                                     hideWrongModal();
-                                }}>
+                                }}
+                            >
                                 OK
                             </Button>
                         </View>
@@ -425,7 +534,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '10%',
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     centeredView: {
         marginTop: -25,
