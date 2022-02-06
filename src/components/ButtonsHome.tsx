@@ -5,8 +5,11 @@ import { View } from './Themed';
 import { findAnswerFromUser } from '../services/User';
 import { AxiosResponse } from 'axios';
 import AuthContext from '../contexts/authContext';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function ButtonsHome({ navigation }: { navigation: any }) {
+    const isFocused = useIsFocused();
+
     const [points, setPoints] = React.useState(0);
     const { auth, setAuthData } = React.useContext(AuthContext) as any;
 
@@ -38,7 +41,7 @@ export default function ButtonsHome({ navigation }: { navigation: any }) {
         } catch (err) {
             console.log(err);
         }
-    }, [auth]);
+    }, [auth, isFocused]);
 
     return (
         <View style={styles.container}>

@@ -23,6 +23,7 @@ import { deleteAnswersFromUser, findAnswerFromUser } from '../services/User';
 import { AxiosResponse } from 'axios';
 import useColorScheme from '../hooks/useColorScheme';
 import { FontAwesome } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function GameScreen({
     route,
@@ -31,6 +32,8 @@ export default function GameScreen({
     route: any;
     navigation: any;
 }) {
+    const isFocused = useIsFocused();
+
     const continueGame = route.params?.continueGame;
     const colorScheme = useColorScheme();
 
@@ -102,7 +105,7 @@ export default function GameScreen({
         } catch (err) {
             console.log(err);
         }
-    }, [auth]);
+    }, [auth, isFocused]);
 
     React.useEffect(() => {
         const callApiFindAllProblems = async () => {

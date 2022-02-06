@@ -5,8 +5,11 @@ import { ProgressBar } from 'react-native-paper';
 import { AxiosResponse } from 'axios';
 import AuthContext from '../contexts/authContext';
 import { findAnswerFromUser } from '../services/User';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function HistoryScreen() {
+    const isFocused = useIsFocused();
+
     const [rate, setRate] = React.useState(0);
     const [points, setPoints] = React.useState(0);
     const [corrects, setCorrects] = React.useState(0);
@@ -32,7 +35,7 @@ export default function HistoryScreen() {
     React.useEffect(() => {
         setCorrects(0);
         setIncorrects(0);
-    }, []);
+    }, [isFocused]);
 
     React.useEffect(() => {
         const callAPiFindAnswerFromUser = async () => {
@@ -83,7 +86,7 @@ export default function HistoryScreen() {
         } catch (err) {
             console.log(err);
         }
-    }, [auth]);
+    }, [auth, isFocused]);
 
     const getProgress = () => {
         if (level === 'Estagiário') {
