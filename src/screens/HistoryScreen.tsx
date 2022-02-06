@@ -6,15 +6,6 @@ import { AxiosResponse } from 'axios';
 import AuthContext from '../contexts/authContext';
 import { findAnswerFromUser } from '../services/User';
 
-const levels = [
-    'Estagiário',
-    'Júnior',
-    'Pleno',
-    'Sênior',
-    'Master',
-    'Especialista',
-];
-
 export default function HistoryScreen() {
     const [rate, setRate] = React.useState(0);
     const [points, setPoints] = React.useState(0);
@@ -53,36 +44,38 @@ export default function HistoryScreen() {
 
             if (response.status !== 200) throw Error(message);
 
-            const { points } = payload.reduce(
-                (acc: any, curr: any) => {
-                    return {
-                        points: acc.points + curr.points,
-                    };
-                },
-                { points: 0 }
-            );
+            if (payload.length !== 0) {
+                const { points } = payload.reduce(
+                    (acc: any, curr: any) => {
+                        return {
+                            points: acc.points + curr.points,
+                        };
+                    },
+                    { points: 0 }
+                );
 
-            const correctAnswer = payload.reduce((acc: any, curr: any) => {
-                return curr.isCorrect ? acc + 1 : acc;
-            }, 0);
+                const correctAnswer = payload.reduce((acc: any, curr: any) => {
+                    return curr.isCorrect ? acc + 1 : acc;
+                }, 0);
 
-            payload.map((curr: any) => {
-                if (curr.isCorrect) {
-                    setCorrects((prevState: number) => prevState + 1);
-                } else {
-                    setIncorrects((prevState: number) => prevState + 1);
-                }
-            });
+                payload.map((curr: any) => {
+                    if (curr.isCorrect) {
+                        setCorrects((prevState: number) => prevState + 1);
+                    } else {
+                        setIncorrects((prevState: number) => prevState + 1);
+                    }
+                });
 
-            if (points <= 666) setLevel('Estagiário');
-            else if (points <= 1333) setLevel('Júnior');
-            else if (points <= 2000) setLevel('Pleno');
-            else if (points <= 2666) setLevel('Sênior');
-            else if (points <= 3333) setLevel('Master');
-            else if (points <= 4000) setLevel('Especialista');
+                if (points <= 666) setLevel('Estagiário');
+                else if (points <= 1333) setLevel('Júnior');
+                else if (points <= 2000) setLevel('Pleno');
+                else if (points <= 2666) setLevel('Sênior');
+                else if (points <= 3333) setLevel('Master');
+                else if (points <= 4000) setLevel('Especialista');
 
-            setPoints(points);
-            setRate(Math.trunc((correctAnswer * 100) / payload.length));
+                setPoints(points);
+                setRate(Math.trunc((correctAnswer * 100) / payload.length));
+            }
         };
 
         try {
@@ -94,25 +87,19 @@ export default function HistoryScreen() {
 
     const getProgress = () => {
         if (level === 'Estagiário') {
-            return ((points * 100) / 666) / 100;
+            return (points * 100) / 666 / 100;
         } else if (level === 'Júnior') {
-            return ((points * 100) / 1333) / 100;
+            return (points * 100) / 1333 / 100;
         } else if (level === 'Pleno') {
-            return ((points * 100) / 2000) / 100;
+            return (points * 100) / 2000 / 100;
         } else if (level === 'Sênior') {
-            return ((points * 100) / 2666) / 100;
+            return (points * 100) / 2666 / 100;
         } else if (level === 'Master') {
-            return ((points * 100) / 3333) / 100;
+            return (points * 100) / 3333 / 100;
         } else if (level === 'Especialista') {
-            return ((points * 100) / 4000) / 100;
+            return (points * 100) / 4000 / 100;
         }
-    }
-
-    const B = (props: any) => (
-        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
-            {props.children}
-        </Text>
-    );
+    };
 
     const images = [
         {
@@ -220,7 +207,10 @@ export default function HistoryScreen() {
                 <Text style={[styles.progress, { textAlign: 'left' }]}>
                     {level ? level : 'Estagiário'}
                 </Text>
-                <ProgressBar progress={getProgress()} color={'rgb(75, 75, 225)'} />
+                <ProgressBar
+                    progress={getProgress()}
+                    color={'rgb(75, 75, 225)'}
+                />
                 <Text
                     style={[styles.progress, { textAlign: 'right' }]}
                 >{`${nextLevel(level ? level : 'Estagiário')} - ${
@@ -230,7 +220,7 @@ export default function HistoryScreen() {
                 <Text style={[styles.progress, { paddingTop: 35 }]}>
                     Taxa de acertos:
                 </Text>
-                <ProgressBar progress={rate/100} color={'rgb(75,75,225)'} />
+                <ProgressBar progress={rate / 100} color={'rgb(75,75,225)'} />
                 <Text style={[styles.progress, { textAlign: 'right' }]}>
                     {`${corrects}/${corrects + incorrects} - ${rate}%`}
                 </Text>

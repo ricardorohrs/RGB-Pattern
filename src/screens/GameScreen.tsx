@@ -76,7 +76,9 @@ export default function GameScreen({
             }, 0);
 
             setCurrentProblem(getNumberQuestion(correctAnswer));
-            navigation.setOptions({ title: 'Questão ' + getNumberQuestion(correctAnswer)});
+            navigation.setOptions({
+                title: 'Questão ' + getNumberQuestion(correctAnswer),
+            });
         };
 
         const callApiDeleteAnswerFromUser = async () => {
@@ -93,9 +95,9 @@ export default function GameScreen({
 
         try {
             if (continueGame) {
-                callAPiFindAnswerFromUser().then(() => console.log('continue'));
+                callAPiFindAnswerFromUser();
             } else {
-                callApiDeleteAnswerFromUser().then(() => console.log('delete'));
+                callApiDeleteAnswerFromUser();
             }
         } catch (err) {
             console.log(err);
@@ -255,25 +257,21 @@ export default function GameScreen({
         return count === 0 ? count + 2 : count + 1;
     };
 
-    const getColor = () => {
-        return colorScheme === 'dark' ? '#0f0f0f' : '#e3e3e3';
-    };
-
     const getProgress = () => {
         if (level === 'Estagiário') {
-            return ((points * 100) / 666) / 100;
+            return (points * 100) / 666 / 100;
         } else if (level === 'Júnior') {
-            return ((points * 100) / 1333) / 100;
+            return (points * 100) / 1333 / 100;
         } else if (level === 'Pleno') {
-            return ((points * 100) / 2000) / 100;
+            return (points * 100) / 2000 / 100;
         } else if (level === 'Sênior') {
-            return ((points * 100) / 2666) / 100;
+            return (points * 100) / 2666 / 100;
         } else if (level === 'Master') {
-            return ((points * 100) / 3333) / 100;
+            return (points * 100) / 3333 / 100;
         } else if (level === 'Especialista') {
-            return ((points * 100) / 4000) / 100;
+            return (points * 100) / 4000 / 100;
         }
-    }
+    };
 
     return (
         <ScrollView>
@@ -353,7 +351,9 @@ export default function GameScreen({
                 </View>
 
                 <View style={styles.bottomBar}>
-                    <TouchableOpacity onPress={() => navigation.navigate('History')}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('History')}
+                    >
                         <Image
                             style={{
                                 width: 50,
@@ -471,9 +471,7 @@ export default function GameScreen({
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <Text style={styles.alert}>Resposta errada!</Text>
-                        <Text style={styles.subAlert}>
-                            Tente novamente!
-                        </Text>
+                        <Text style={styles.subAlert}>Tente novamente!</Text>
                         <Button
                             style={styles.confirmation}
                             color={'#1e88e5'}
@@ -487,7 +485,6 @@ export default function GameScreen({
                     </View>
                 </View>
             </ReactModal>
-
         </ScrollView>
     );
 }
@@ -536,7 +533,7 @@ const styles = StyleSheet.create({
         height: '10%',
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 30
+        marginBottom: 30,
     },
     centeredView: {
         marginTop: -25,
