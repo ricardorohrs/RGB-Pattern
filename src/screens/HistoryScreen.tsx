@@ -161,7 +161,7 @@ export default function HistoryScreen() {
                 <Text style={styles.subtitle}>
                     {`Você está no nível ${level ? level : 'Estagiário'} com`}
                 </Text>
-                <Text style={styles.score}>{`${points || 150} pontos`}</Text>
+                <Text style={styles.score}>{`${points || 0} pontos`}</Text>
             </View>
 
             <View style={styles.card}>

@@ -1,16 +1,16 @@
-import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React, {useState} from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, Modal as ReactModal } from 'react-native';
 
 import { View } from '../components/Themed';
 import { Button, Dialog, Modal, Portal, ProgressBar, Provider } from 'react-native-paper';
 import { getProblem } from '../services/Problem';
 import AuthContext from '../contexts/authContext';
-import TipsModal from '../components/TipsModal';
 
 import { createAnswer } from '../services/Answer';
 import { findAnswerFromUser } from "../services/User";
 import { AxiosResponse } from "axios";
 import useColorScheme from "../hooks/useColorScheme";
+import {FontAwesome} from "@expo/vector-icons";
 
 export default function GameScreen({ navigation }: { navigation: any }) {
     const colorScheme = useColorScheme();
@@ -30,16 +30,23 @@ export default function GameScreen({ navigation }: { navigation: any }) {
     const showDialog = () => setCheckAnswer(true);
     const hideDialog = () => setCheckAnswer(false);
 
+    //resposta certa
     const [correctAnswer, setCorrectAnswer] = React.useState(false);
     const showCorrectModal = () => setCorrectAnswer(true);
     const hideCorrectModal = () => setCorrectAnswer(false);
+    //resposta errada
+    const [wrongAnswer, setWrongAnswer] = React.useState(false);
+    const showWrongModal = () => setWrongAnswer(true);
+    const hideWrongModal = () => setWrongAnswer(false);
+
     const containerStyle = {
         backgroundColor: colorScheme === 'light' ? 'white' : 'dark',
         padding: 45,
     };
-    const [wrongAnswer, setWrongAnswer] = React.useState(false);
-    const showWrongModal = () => setWrongAnswer(true);
-    const hideWrongModal = () => setWrongAnswer(false);
+
+    // dicas
+    const [modalVisible, setModalVisible] = useState(false);
+    const [currentTip, setCurrentTip] = useState(0);
 
     React.useEffect(() => {
         const callApiFindAllProblems = async () => {
@@ -62,14 +69,21 @@ export default function GameScreen({ navigation }: { navigation: any }) {
         }
     }, []);
 
+    const [usedTips, setusedTips] = React.useState(false);
+
     // configurar usedTime, numberTipsUsed e points
     const handleOption = async (problemId: number, isCorrect: boolean) => {
+        const points = usedTips ? 150 : 166;
+        const tips = usedTips ? 1 : 0;
+        console.log('tips', tips);
+        console.log('points', points);
+
         try {
             let { status, message } = (await createAnswer(auth.data.token, {
                 usedTime: 200,
-                numberTipsUsed: 1,
+                numberTipsUsed: tips,
                 isCorrect,
-                points: 110,
+                points: isCorrect ? points : 0,
                 user: {
                     id: auth.data.user.userId,
                 },
@@ -102,7 +116,7 @@ export default function GameScreen({ navigation }: { navigation: any }) {
             handleOption(
                 problems[currentProblem].id,
                 true
-            ).then(() => console.log('acertou'));
+            ).then(() => setusedTips(false));
 
         } else {
             handleOption(
@@ -227,7 +241,51 @@ export default function GameScreen({ navigation }: { navigation: any }) {
                         }
                     )}
 
-                <TipsModal tips={tips}/>
+                <View style={styles.centeredView}>
+                    <ReactModal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            setModalVisible(!modalVisible);
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>
+                                    {problems ? problems[currentProblem].tips : null}{' '}
+                                </Text>
+                                <Text style={{ fontSize: 8, marginBottom: 15 }}>
+                                    -10% dos pontos
+                                </Text>
+                                <Button
+                                    mode="contained"
+                                    color={'#1e88e5'}
+                                    labelStyle={{ fontSize: 10 }}
+                                    onPress={() => {
+                                        setCurrentTip(currentTip + 1);
+                                        setModalVisible(!modalVisible);
+                                    }}
+                                >
+                                    OK
+                                </Button>
+                            </View>
+                        </View>
+                    </ReactModal>
+
+                    <Button
+                        color={'#a5a5a5'}
+                        labelStyle={{ fontSize: 10 }}
+                        mode="text"
+                        onPress={() => {
+                            setusedTips(true);
+                            setModalVisible(true);
+                        }}
+                    >
+                        Gostaria de uma dica?&nbsp;
+                        <FontAwesome name="question-circle" size={13} />
+                    </Button>
+                </View>
 
                 <View style={[styles.bottomBar, {backgroundColor: getColor()}]}>
                     <TouchableOpacity onPress={() => navigation.navigate('History')}>
@@ -333,7 +391,7 @@ const styles = StyleSheet.create({
         marginVertical: 50,
     },
     options: {
-        width: 250,
+        maxWidth: 350,
         padding: 10,
         marginBottom: 25,
     },
@@ -368,5 +426,23 @@ const styles = StyleSheet.create({
         height: '10%',
         flexDirection: 'row',
         alignItems: 'center'
+    },
+    centeredView: {
+        marginTop: -25,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+    },
+    modalText: {
+        fontFamily: 'space-mono',
+        marginBottom: 15,
+        textAlign: 'center',
     },
 });
