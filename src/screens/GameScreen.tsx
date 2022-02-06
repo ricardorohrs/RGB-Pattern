@@ -56,12 +56,6 @@ export default function GameScreen({
     const showWrongModal = () => setWrongAnswer(true);
     const hideWrongModal = () => setWrongAnswer(false);
 
-    // modais
-    const containerStyle = {
-        backgroundColor: colorScheme === 'light' ? 'white' : 'dark',
-        padding: 45,
-    };
-
     // dicas
     const [usedTips, setusedTips] = React.useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -82,7 +76,7 @@ export default function GameScreen({
             }, 0);
 
             setCurrentProblem(getNumberQuestion(correctAnswer));
-            navigation.setOptions({ title: 'Questão ' + getNumberQuestion(correctAnswer) });
+            navigation.setOptions({ title: 'Questão ' + getNumberQuestion(correctAnswer)});
         };
 
         const callApiDeleteAnswerFromUser = async () => {
@@ -98,8 +92,11 @@ export default function GameScreen({
         };
 
         try {
-            if (continueGame) callAPiFindAnswerFromUser();
-            else callApiDeleteAnswerFromUser();
+            if (continueGame) {
+                callAPiFindAnswerFromUser().then(() => console.log('continue'));
+            } else {
+                callApiDeleteAnswerFromUser().then(() => console.log('delete'));
+            }
         } catch (err) {
             console.log(err);
         }
@@ -126,8 +123,9 @@ export default function GameScreen({
         }
     }, []);
 
+    const [finalPoints, setfinalPoints] = React.useState(166);
     const handleOption = async (problemId: number, isCorrect: boolean) => {
-        const points = usedTips ? 150 : 166;
+        setfinalPoints(usedTips ? 150 : 166);
         const tips = usedTips ? 1 : 0;
 
         try {
@@ -135,7 +133,7 @@ export default function GameScreen({
                 usedTime: 200,
                 numberTipsUsed: tips,
                 isCorrect,
-                points: isCorrect ? points : 0,
+                points: isCorrect ? finalPoints : 0,
                 user: {
                     id: auth.data.user.userId,
                 },
@@ -354,12 +352,8 @@ export default function GameScreen({
                     </Button>
                 </View>
 
-                <View
-                    style={[styles.bottomBar, { backgroundColor: getColor() }]}
-                >
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('History')}
-                    >
+                <View style={styles.bottomBar}>
+                    <TouchableOpacity onPress={() => navigation.navigate('History')}>
                         <Image
                             style={{
                                 width: 50,
@@ -369,7 +363,7 @@ export default function GameScreen({
                             source={images[badges(level)].image}
                         />
                     </TouchableOpacity>
-                    <View style={{ backgroundColor: getColor() }}>
+                    <View>
                         <Text style={[styles.progress, { textAlign: 'left' }]}>
                             {level ? level : 'Estagiário'}
                         </Text>
@@ -425,70 +419,75 @@ export default function GameScreen({
                 </Portal>
             </Provider>
 
-            <Provider>
-                <Portal>
-                    <Modal
-                        visible={correctAnswer}
-                        onDismiss={hideCorrectModal}
-                        contentContainerStyle={containerStyle}
-                    >
-                        <View style={styles.modal}>
-                            <Image
-                                style={styles.badge}
-                                source={images[badges(level)].image}
-                            />
-                            <Text style={styles.alert}>Parabéns!</Text>
-                            <Text style={styles.alert}>Resposta certa!</Text>
-                            <Text style={styles.subAlert}>
-                                Você recebeu 100 pontos.
-                            </Text>
-                            <Button
-                                style={styles.confirmation}
-                                color={'#1e88e5'}
-                                mode="contained"
-                                onPress={() => {
-                                    hideCorrectModal();
-                                    setCurrentProblem(currentProblem + 1);
-                                    navigation.setOptions({
-                                        title:
-                                            'Questão ' +
-                                            getNumberQuestion(currentProblem),
-                                    });
-                                }}
-                            >
-                                Próxima pergunta
-                            </Button>
-                        </View>
-                    </Modal>
-                </Portal>
-            </Provider>
+            <ReactModal
+                animationType="slide"
+                transparent={true}
+                visible={correctAnswer}
+                hardwareAccelerated={true}
+                onRequestClose={() => {
+                    hideCorrectModal();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Image
+                            style={styles.badge}
+                            source={images[badges(level)].image}
+                        />
+                        <Text style={styles.alert}>Parabéns!</Text>
+                        <Text style={styles.alert}>Resposta certa!</Text>
+                        <Text style={styles.subAlert}>
+                            Você recebeu {finalPoints} pontos.
+                        </Text>
+                        <Button
+                            style={styles.confirmation}
+                            color={'#1e88e5'}
+                            mode="contained"
+                            onPress={() => {
+                                hideCorrectModal();
+                                setCurrentProblem(currentProblem + 1);
+                                navigation.setOptions({
+                                    title:
+                                        'Questão ' +
+                                        getNumberQuestion(currentProblem),
+                                });
+                            }}
+                        >
+                            Próxima pergunta
+                        </Button>
+                    </View>
+                </View>
+            </ReactModal>
 
-            <Provider>
-                <Portal>
-                    <Modal
-                        visible={wrongAnswer}
-                        onDismiss={hideWrongModal}
-                        contentContainerStyle={containerStyle}
-                    >
-                        <View style={styles.modal}>
-                            <Text style={styles.alert}>Resposta errada!</Text>
-                            <Text style={styles.subAlert}>
-                                Tente novamente!
-                            </Text>
-                            <Button
-                                style={styles.confirmation}
-                                color={'#1e88e5'}
-                                mode="contained"
-                                onPress={() => {
-                                    hideWrongModal();
-                                }}
-                            >
-                                OK
-                            </Button>
-                        </View>
-                    </Modal>
-                </Portal>
-            </Provider>
+            <ReactModal
+                animationType="slide"
+                transparent={true}
+                visible={wrongAnswer}
+                hardwareAccelerated={true}
+                onRequestClose={() => {
+                    hideWrongModal();
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.alert}>Resposta errada!</Text>
+                        <Text style={styles.subAlert}>
+                            Tente novamente!
+                        </Text>
+                        <Button
+                            style={styles.confirmation}
+                            color={'#1e88e5'}
+                            mode="contained"
+                            onPress={() => {
+                                hideWrongModal();
+                            }}
+                        >
+                            OK
+                        </Button>
+                    </View>
+                </View>
+            </ReactModal>
+
         </ScrollView>
     );
 }
@@ -501,7 +500,7 @@ const styles = StyleSheet.create({
     question: {
         fontSize: 20,
         fontFamily: 'space-mono',
-        paddingHorizontal: 40,
+        paddingHorizontal: 30,
         marginVertical: 50,
         textAlign: 'justify',
     },
@@ -518,10 +517,6 @@ const styles = StyleSheet.create({
     subAlert: {
         fontSize: 18,
         marginTop: 5,
-    },
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
     },
     confirmation: {
         padding: 10,
@@ -541,6 +536,7 @@ const styles = StyleSheet.create({
         height: '10%',
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 30
     },
     centeredView: {
         marginTop: -25,

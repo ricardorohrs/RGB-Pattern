@@ -37,7 +37,7 @@ export const findAnswerFromUser = async (token: string, userId: string) => {
 export const deleteAnswersFromUser = async (token: string, userId: string) => {
     try {
         return await Axios.delete(
-            `${apiUrl}/users/${userId}/answers/deleteAnswerFromUser`,
+            `${apiUrl}/users/${userId}/answers/deleteAnswersFromUser`,
             {
                 headers: { Authorization: `Bearer ${token}` },
             }
